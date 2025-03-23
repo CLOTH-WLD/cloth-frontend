@@ -2,6 +2,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious 
+} from '@/components/ui/carousel';
 import { Button } from './ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -37,14 +44,9 @@ const CategoryCarousel: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: false,
-    duration: 20,
-    dragFree: false, // Use 'dragFree' instead of 'draggable'
-  });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, duration: 20 });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
-  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleCategoryClick = (category: string) => {
     navigate(`/?category=${category.toLowerCase()}`);
@@ -74,78 +76,13 @@ const CategoryCarousel: React.FC = () => {
     };
   }, [emblaApi, onSelect]);
 
-  const handlePrev = () => {
-    if (isAnimating || !canScrollPrev || !emblaApi) return;
-    setIsAnimating(true);
-    
-    // Get the current slide and apply fade-out animation
-    const currentSlide = document.querySelector(`.carousel-item-${currentIndex}`);
-    if (currentSlide) {
-      currentSlide.classList.add('animate-fade-out');
-      
-      setTimeout(() => {
-        emblaApi.scrollPrev();
-        currentSlide.classList.remove('animate-fade-out');
-        
-        // Get the new slide and apply fade-in animation
-        const newIndex = currentIndex - 1;
-        const newSlide = document.querySelector(`.carousel-item-${newIndex}`);
-        if (newSlide) {
-          newSlide.classList.add('animate-fade-in');
-          setTimeout(() => {
-            newSlide.classList.remove('animate-fade-in');
-            setIsAnimating(false);
-          }, 300);
-        } else {
-          setIsAnimating(false);
-        }
-      }, 300);
-    } else {
-      setIsAnimating(false);
-    }
-  };
-
-  const handleNext = () => {
-    if (isAnimating || !canScrollNext || !emblaApi) return;
-    setIsAnimating(true);
-    
-    // Get the current slide and apply fade-out animation
-    const currentSlide = document.querySelector(`.carousel-item-${currentIndex}`);
-    if (currentSlide) {
-      currentSlide.classList.add('animate-fade-out');
-      
-      setTimeout(() => {
-        emblaApi.scrollNext();
-        currentSlide.classList.remove('animate-fade-out');
-        
-        // Get the new slide and apply fade-in animation
-        const newIndex = currentIndex + 1;
-        const newSlide = document.querySelector(`.carousel-item-${newIndex}`);
-        if (newSlide) {
-          newSlide.classList.add('animate-fade-in');
-          setTimeout(() => {
-            newSlide.classList.remove('animate-fade-in');
-            setIsAnimating(false);
-          }, 300);
-        } else {
-          setIsAnimating(false);
-        }
-      }, 300);
-    } else {
-      setIsAnimating(false);
-    }
-  };
-
   return (
     <div className="w-full mb-8">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {carouselItems.map((item, index) => (
-            <div 
-              key={item.id} 
-              className={`carousel-item-${index} min-w-0 shrink-0 grow-0 basis-full transition-opacity duration-300`}
-            >
-              <div className={`${item.bgColor} relative w-full h-[60vh] md:h-[450px] text-white`}>
+            <div key={item.id} className="min-w-0 shrink-0 grow-0 basis-full transition-opacity duration-500">
+              <div className={`${item.bgColor} relative w-full h-[80vh] md:h-[450px] text-white`}>
                 <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
                   <h1 className="text-lg font-helvetica mb-4 md:mb-6">{item.title}</h1>
                   
@@ -166,7 +103,7 @@ const CategoryCarousel: React.FC = () => {
                     <img 
                       src={item.image} 
                       alt={`${item.id} category`} 
-                      className="h-full max-h-[50vh] md:max-h-[350px] object-cover"
+                      className="h-full max-h-[60vh] md:max-h-[350px] object-cover"
                     />
                   </div>
                   
@@ -185,9 +122,8 @@ const CategoryCarousel: React.FC = () => {
         <>
           {canScrollPrev && (
             <button 
-              onClick={handlePrev} 
+              onClick={() => emblaApi?.scrollPrev()} 
               className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center"
-              disabled={isAnimating}
             >
               <ArrowLeft className="w-6 h-6" />
             </button>
@@ -195,9 +131,8 @@ const CategoryCarousel: React.FC = () => {
           
           {canScrollNext && (
             <button 
-              onClick={handleNext} 
+              onClick={() => emblaApi?.scrollNext()} 
               className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center"
-              disabled={isAnimating}
             >
               <ArrowRight className="w-6 h-6" />
             </button>
