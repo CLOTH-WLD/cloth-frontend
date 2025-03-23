@@ -11,6 +11,15 @@ export interface Product {
   discountPercentage?: number;
   isFavorite?: boolean;
   variants?: ProductVariant[];
+  colors?: ProductColor[];
+  sizes?: string[];
+  images?: string[];
+}
+
+export interface ProductColor {
+  name: string;
+  value: string;
+  image: string;
 }
 
 export interface ProductVariant {

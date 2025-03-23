@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '@/services/paymentService';
 import { Button } from '@/components/ui/button';
+import { toggleFavorite } from '@/services/productService';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProductCardProps {
   product: Product;
@@ -19,11 +21,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
     ? product.price * (1 - (product.discountPercentage as number) / 100) 
     : product.price;
   
-  const handleAddToFavorites = (e: React.MouseEvent) => {
+  const { toast } = useToast();
+  
+  const handleAddToFavorites = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Will implement favorites functionality later
-    console.log('Added to favorites:', product.title);
+    try {
+      const isFavorite = await toggleFavorite(product.id);
+      toast({
+        title: isFavorite ? "Added to Favorites" : "Removed from Favorites",
+        description: isFavorite 
+          ? `${product.title} has been added to your favorites.` 
+          : `${product.title} has been removed from your favorites.`,
+      });
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
   };
   
   // Truncate title to 36 characters and add ellipsis if needed
@@ -52,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
             className="absolute top-2 right-0 bg-white hover:bg-white/90 rounded-full p-1.5 shadow-sm"
             size="icon"
             variant="outline"
-            aria-label="Add to favorites"
+            aria-label={product.isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
             <Heart 
               className={`h-5 w-5 ${product.isFavorite ? 'text-red-500 fill-red-500' : 'text-black'}`} 

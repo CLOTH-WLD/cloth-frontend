@@ -1,4 +1,3 @@
-
 import { Product } from '@/types/product';
 
 // Mock data for products until we integrate with Shopify
@@ -14,6 +13,31 @@ const mockProducts: Product[] = [
     inStock: true,
     discountPercentage: 20,
     isFavorite: true,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    colors: [
+      { 
+        name: 'White', 
+        value: '#FFFFFF', 
+        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' 
+      },
+      { 
+        name: 'Black', 
+        value: '#000000', 
+        image: 'https://images.unsplash.com/photo-1618677831708-0e7fda3148b6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' 
+      },
+      { 
+        name: 'Navy', 
+        value: '#0A1F4A', 
+        image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' 
+      }
+    ],
+    images: [
+      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1597843722681-5c6c039f0763?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1618677831708-0e7fda3148b6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1562157873-818bc0726f68?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+    ],
   },
   {
     id: '2',
@@ -114,6 +138,21 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
     setTimeout(() => {
       const products = mockProducts.filter(p => p.category === category);
       resolve(products);
+    }, 300);
+  });
+};
+
+export const toggleFavorite = async (productId: string): Promise<boolean> => {
+  // This would be a real API call in production
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const productIndex = mockProducts.findIndex(p => p.id === productId);
+      if (productIndex !== -1) {
+        mockProducts[productIndex].isFavorite = !mockProducts[productIndex].isFavorite;
+        resolve(mockProducts[productIndex].isFavorite || false);
+      } else {
+        resolve(false);
+      }
     }, 300);
   });
 };
