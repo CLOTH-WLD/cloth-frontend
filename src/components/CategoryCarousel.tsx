@@ -1,16 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from '@/components/ui/carousel';
 import { Button } from './ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import useEmblaCarousel from 'embla-carousel-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const carouselItems = [
   {
@@ -43,9 +37,6 @@ const CategoryCarousel: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, duration: 20, dragFree: false });
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const handleCategoryClick = (category: string) => {
@@ -58,31 +49,55 @@ const CategoryCarousel: React.FC = () => {
     { id: 'kids', buttonText: 'Kids' }
   ];
 
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setCurrentIndex(emblaApi.selectedScrollSnap());
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
+  const goToPrevSlide = useCallback(() => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? carouselItems.length - 1 : prevIndex - 1
+    );
+    
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 500); // Match this with animation duration
+  }, [isAnimating]);
 
+  const goToNextSlide = useCallback(() => {
+    if (isAnimating) return;
+    
+    setIsAnimating(true);
+    setCurrentIndex((prevIndex) => 
+      prevIndex === carouselItems.length - 1 ? 0 : prevIndex + 1
+    );
+    
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 500); // Match this with animation duration
+  }, [isAnimating]);
+
+  // Auto-advance carousel
   useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
-    return () => {
-      emblaApi.off('select', onSelect);
-      emblaApi.off('reInit', onSelect);
-    };
-  }, [emblaApi, onSelect]);
+    const interval = setInterval(() => {
+      goToNextSlide();
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [goToNextSlide]);
 
   return (
-    <div className="w-full mb-8 category-carousel">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
+    <div className="w-full mb-8 category-carousel relative">
+      <div className="overflow-hidden relative h-[80vh] md:h-[450px]">
+        <AnimatePresence mode="wait">
           {carouselItems.map((item, index) => (
-            <div key={item.id} className="min-w-0 shrink-0 grow-0 basis-full transition-opacity duration-500">
-              <div className={`${item.bgColor} relative w-full h-[80vh] md:h-[450px] text-white`}>
+            index === currentIndex && (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className={`absolute inset-0 ${item.bgColor} w-full h-full text-white`}
+              >
                 <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
                   <h1 className="text-lg font-helvetica mb-4 md:mb-6">{item.title}</h1>
                   
@@ -112,31 +127,48 @@ const CategoryCarousel: React.FC = () => {
                     <p className="text-base md:text-xl font-tiempos">{item.description}</p>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            )
           ))}
-        </div>
+        </AnimatePresence>
       </div>
       
       {carouselItems.length > 1 && (
         <>
-          {canScrollPrev && (
-            <button 
-              onClick={() => emblaApi?.scrollPrev()} 
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-          )}
+          <button 
+            onClick={goToPrevSlide} 
+            disabled={isAnimating}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
           
-          {canScrollNext && (
-            <button 
-              onClick={() => emblaApi?.scrollNext()} 
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center"
-            >
-              <ArrowRight className="w-6 h-6" />
-            </button>
-          )}
+          <button 
+            onClick={goToNextSlide}
+            disabled={isAnimating}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
+          >
+            <ArrowRight className="w-6 h-6" />
+          </button>
+          
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
+            {carouselItems.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  if (!isAnimating && index !== currentIndex) {
+                    setIsAnimating(true);
+                    setCurrentIndex(index);
+                    setTimeout(() => setIsAnimating(false), 500);
+                  }
+                }}
+                className={`h-2 w-2 rounded-full transition-colors duration-300 ${
+                  index === currentIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
