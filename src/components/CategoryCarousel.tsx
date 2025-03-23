@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/carousel';
 import { Button } from './ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
+import useEmblaCarousel from 'embla-carousel-react';
 
 const carouselItems = [
   {
@@ -19,7 +20,7 @@ const carouselItems = [
     subtitle: 'What will I wear?',
     description: 'With the new season comes a new collection full of stylish pieces for your wardrobe.',
     bgColor: 'bg-[#4285F4]', // Blue
-    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=1600&h=900'
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&h=900'
   },
   {
     id: 'men',
@@ -43,6 +44,9 @@ const CategoryCarousel: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, duration: 20 });
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(true);
 
   const handleCategoryClick = (category: string) => {
     navigate(`/?category=${category.toLowerCase()}`);
@@ -54,18 +58,30 @@ const CategoryCarousel: React.FC = () => {
     { id: 'kids', buttonText: 'Kids' }
   ];
 
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentIndex(emblaApi.selectedScrollSnap());
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
   return (
     <div className="w-full mb-8">
-      <Carousel 
-        className="w-full" 
-        opts={{
-          loop: true,
-          duration: 20,
-        }}
-      >
-        <CarouselContent>
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
           {carouselItems.map((item, index) => (
-            <CarouselItem key={item.id} className="transition-opacity duration-500">
+            <div key={item.id} className="min-w-0 shrink-0 grow-0 basis-full transition-opacity duration-500">
               <div className={`${item.bgColor} relative w-full h-[80vh] md:h-[450px] text-white`}>
                 <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
                   <h1 className="text-lg font-helvetica mb-4 md:mb-6">{item.title}</h1>
@@ -83,7 +99,7 @@ const CategoryCarousel: React.FC = () => {
                     ))}
                   </div>
                   
-                  <div className="flex-1 relative mt-6 flex justify-end">
+                  <div className="flex-1 relative mt-6 flex justify-end pr-0">
                     <img 
                       src={item.image} 
                       alt={`${item.id} category`} 
@@ -97,17 +113,32 @@ const CategoryCarousel: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </CarouselItem>
+            </div>
           ))}
-        </CarouselContent>
-        
-        {carouselItems.length > 1 && (
-          <>
-            <CarouselPrevious className="left-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
-            <CarouselNext className="right-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
-          </>
-        )}
-      </Carousel>
+        </div>
+      </div>
+      
+      {carouselItems.length > 1 && (
+        <>
+          {canScrollPrev && (
+            <button 
+              onClick={() => emblaApi?.scrollPrev()} 
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+          )}
+          
+          {canScrollNext && (
+            <button 
+              onClick={() => emblaApi?.scrollNext()} 
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center"
+            >
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 };
