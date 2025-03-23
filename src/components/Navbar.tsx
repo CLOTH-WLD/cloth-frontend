@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, User, Heart, Menu, Search } from 'lucide-react';
+import { ShoppingBag, User, Heart, Search } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
@@ -12,29 +12,24 @@ const Navbar: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   
   return (
-    <motion.header 
-      className="sticky top-0 z-50 w-full glass-blur px-4 py-3 flex flex-col border-b"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b">
       {/* Top row with logo and icons */}
-      <div className="flex items-center justify-between w-full">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
         <Link to="/" className="flex items-center space-x-2">
           <span className="text-xl font-semibold tracking-tighter">Cloth</span>
         </Link>
         
-        <div className="flex items-center space-x-4">
-          <Link to="/profile" className="p-2">
-            <User className="w-5 h-5" />
+        <div className="flex items-center space-x-5">
+          <Link to="/profile" className="p-1">
+            <User className="w-6 h-6" />
           </Link>
           
-          <Link to="/favorites" className="p-2">
-            <Heart className="w-5 h-5" />
+          <Link to="/favorites" className="p-1">
+            <Heart className="w-6 h-6" />
           </Link>
           
-          <Link to="/cart" className="relative p-2">
-            <ShoppingBag className="w-5 h-5" />
+          <Link to="/cart" className="relative p-1">
+            <ShoppingBag className="w-6 h-6" />
             {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-cloth-charcoal text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                 {itemCount}
@@ -45,22 +40,28 @@ const Navbar: React.FC = () => {
       </div>
       
       {/* Bottom row with burger menu and search */}
-      <div className="flex items-center justify-between w-full mt-2">
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="w-5 h-5" />
-        </Button>
-        
-        <div className={`flex-1 mx-2 transition-all duration-200 ${showSearch ? 'opacity-100' : 'opacity-100'}`}>
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-cloth-mediumgray" />
+      <div className="border-t border-gray-200">
+        <div className="max-w-7xl mx-auto flex items-center w-full">
+          <button className="px-5 py-3 border-r border-gray-200 flex flex-col space-y-1.5">
+            <div className="w-5 h-0.5 bg-black"></div>
+            <div className="w-5 h-0.5 bg-black"></div>
+            <div className="w-5 h-0.5 bg-black"></div>
+          </button>
+          
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-cloth-mediumgray" />
             <Input 
               placeholder="Search products..." 
-              className="pl-8 h-9 w-full"
+              className="pl-12 h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
+          
+          <button className="px-5 py-3 border-l border-gray-200">
+            <Search className="w-6 h-6" />
+          </button>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 };
 
