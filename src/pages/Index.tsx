@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
@@ -56,9 +55,6 @@ const Index: React.FC = () => {
           <CategoryCarousel />
         </div>
         
-        {/* Category Grid */}
-        <CategoryGrid />
-        
         {/* Products Section */}
         <div className="py-6 px-4 sm:px-6 max-w-7xl mx-auto">
           <motion.div
@@ -99,6 +95,9 @@ const Index: React.FC = () => {
             </div>
           )}
         </div>
+        
+        {/* Favorite Categories Grid */}
+        <CategoryGrid />
         
         {/* Notification Banner */}
         <NotificationBanner />

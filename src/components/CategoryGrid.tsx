@@ -1,65 +1,59 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 const categories = [
-  {
-    id: 'women',
-    title: 'Women',
-    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&h=800',
-    color: 'bg-cloth-beige',
-  },
-  {
-    id: 'men',
-    title: 'Men',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&h=800',
-    color: 'bg-cloth-lightbeige',
-  },
-  {
-    id: 'kids',
-    title: 'Kids',
-    image: 'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&h=800',
-    color: 'bg-cloth-offwhite',
-  },
-  {
-    id: 'accessories',
-    title: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1608042314453-ae338d80c427?auto=format&fit=crop&w=800&h=800',
-    color: 'bg-cloth-lightgray',
-  }
+  "Women's shoes",
+  "Women's t-shirts and tops",
+  "Women's backpacks",
+  "Women's jeans",
+  "Women's cardigans",
+  "Women's boots",
+  "Women's clothing",
+  "Women's swimwear",
+  "Women's sunglasses",
+  "Women's sneakers",
+  "Women's evening dresses",
+  "Women's casual dresses",
+  "Kids' hats",
+  "Kids' clothing",
+  "Denim dresses",
+  "Handbags",
+  "Cosmetic bags",
+  "Men's shoes",
+  "Men's t-shirts",
+  "Men's backpacks",
+  "Men's cargo pants",
+  "Men's jeans",
+  "Men's trousers",
+  "Men's leather jackets",
+  "Men's kidney bags",
+  "Men's clothing",
+  "Men's belts",
+  "Men's jewelry"
 ];
 
 const CategoryGrid: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleCategoryClick = (categoryId: string) => {
-    navigate(`/?category=${categoryId}`);
+  const handleCategoryClick = (category: string) => {
+    // Convert the category to a URL-friendly format
+    const formattedCategory = category.toLowerCase().replace(/['']/g, '').replace(/\s+/g, '-');
+    navigate(`/?category=${formattedCategory}`);
   };
 
   return (
     <div className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {categories.map((category, index) => (
-          <motion.div
-            key={category.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            className={`${category.color} rounded-md overflow-hidden cursor-pointer group`}
-            onClick={() => handleCategoryClick(category.id)}
+      <h2 className="text-2xl font-semibold mb-6">Favorite categories</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => handleCategoryClick(category)}
+            className="text-left p-3 hover:bg-cloth-lightbeige transition-colors rounded-md"
           >
-            <div className="aspect-square relative overflow-hidden">
-              <img 
-                src={category.image} 
-                alt={category.title}
-                className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/20 flex items-end p-4">
-                <h3 className="text-white text-xl font-medium">{category.title}</h3>
-              </div>
-            </div>
-          </motion.div>
+            {category}
+          </button>
         ))}
       </div>
     </div>
