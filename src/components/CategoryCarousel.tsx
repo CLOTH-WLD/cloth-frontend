@@ -65,7 +65,7 @@ const CategoryCarousel: React.FC = () => {
     
     setTimeout(() => {
       setIsAnimating(false);
-    }, 500); // Match this with animation duration
+    }, 300); // Reduced from 500ms to 300ms for quicker animation
   }, [isAnimating, currentIndex]);
 
   const goToNextSlide = useCallback(() => {
@@ -80,7 +80,7 @@ const CategoryCarousel: React.FC = () => {
     
     setTimeout(() => {
       setIsAnimating(false);
-    }, 500); // Match this with animation duration
+    }, 300); // Reduced from 500ms to 300ms for quicker animation
   }, [isAnimating, currentIndex]);
 
   // Auto-advance carousel
@@ -95,10 +95,10 @@ const CategoryCarousel: React.FC = () => {
   return (
     <div className="w-full mb-8 category-carousel relative">
       <div 
-        className="overflow-hidden relative h-[80vh] md:h-[450px] transition-colors duration-1000"
+        className="overflow-hidden relative h-[80vh] md:h-[450px] transition-colors duration-700"
         style={{ backgroundColor }}
       >
-        <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col text-white">
+        <div className="absolute inset-0 z-10 pt-4 pl-4 pb-4 pr-0 flex flex-col text-white">
           <h1 className="text-lg font-helvetica mb-4 md:mb-6">{carouselItems[currentIndex].title}</h1>
           
           <div className="flex space-x-2 md:space-x-4">
@@ -124,7 +124,7 @@ const CategoryCarousel: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                transition={{ duration: 0.3 }} // Reduced from 0.5s to 0.3s
               />
             </AnimatePresence>
           </div>
@@ -136,7 +136,7 @@ const CategoryCarousel: React.FC = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                transition={{ duration: 0.3 }} // Reduced from 0.5s to 0.3s
               >
                 <h2 className="text-xl md:text-2xl font-bold font-helvetica mb-2">{carouselItems[currentIndex].subtitle}</h2>
                 <p className="text-base md:text-xl font-tiempos">{carouselItems[currentIndex].description}</p>
@@ -173,7 +173,7 @@ const CategoryCarousel: React.FC = () => {
                     setIsAnimating(true);
                     setCurrentIndex(index);
                     setBackgroundColor(carouselItems[index].color);
-                    setTimeout(() => setIsAnimating(false), 500);
+                    setTimeout(() => setIsAnimating(false), 300); // Reduced from 500ms to 300ms
                   }
                 }}
                 className={`h-2 w-2 rounded-full transition-colors duration-300 ${
