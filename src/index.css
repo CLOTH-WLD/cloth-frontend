@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Font imports for Helvetica Now and Tiempos (using system fonts as fallbacks) */
@@ -150,5 +151,14 @@
       linear-gradient(to right, rgba(210, 210, 210, 0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(210, 210, 210, 0.05) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+  
+  /* Ensure line-clamp works properly */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
