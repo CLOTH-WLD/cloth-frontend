@@ -1,14 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types/product';
 import { getAllProducts } from '@/services/productService';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import CategoryFilter from '@/components/CategoryFilter';
 
 const Index: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const categoryFilter = searchParams.get('category');
   
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,11 +32,21 @@ const Index: React.FC = () => {
     fetchProducts();
   }, []);
   
+  useEffect(() => {
+    if (categoryFilter && categoryFilter !== 'all') {
+      setFilteredProducts(products.filter(product => 
+        product.category.toLowerCase() === categoryFilter.toLowerCase()
+      ));
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [products, categoryFilter]);
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-1 pt-6 pb-20 px-4 sm:px-6 max-w-7xl mx-auto">
+      <main className="flex-1 pt-6 pb-12 px-4 sm:px-6 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -42,6 +58,8 @@ const Index: React.FC = () => {
             Discover our newest arrivals for the season
           </p>
         </motion.div>
+        
+        <CategoryFilter />
         
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -55,14 +73,20 @@ const Index: React.FC = () => {
               </div>
             ))}
           </div>
-        ) : (
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {products.map((product, index) => (
+            {filteredProducts.map((product, index) => (
               <ProductCard key={product.id} product={product} index={index} />
             ))}
           </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-cloth-mediumgray">No products found in this category</p>
+          </div>
         )}
       </main>
+      
+      <Footer />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { formatCurrency } from '@/services/paymentService';
 
 const ProductDetail: React.FC = () => {
@@ -67,10 +68,10 @@ const ProductDetail: React.FC = () => {
   if (!product) return null;
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <button 
           onClick={() => navigate(-1)}
           className="flex items-center text-sm mb-6 text-cloth-mediumgray hover:text-cloth-charcoal transition-colors"
@@ -135,6 +136,8 @@ const ProductDetail: React.FC = () => {
           </motion.div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 };

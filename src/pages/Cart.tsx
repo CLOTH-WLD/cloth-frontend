@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/context/CartContext';
 import CartItem from '@/components/CartItem';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { formatCurrency, initiatePayment } from '@/services/paymentService';
 
@@ -110,6 +111,8 @@ const Cart: React.FC = () => {
           </>
         )}
       </main>
+      
+      <Footer />
     </div>
   );
 };
