@@ -159,30 +159,10 @@ const CategoryCarousel: React.FC = () => {
           <button 
             onClick={goToNextSlide}
             disabled={isAnimating}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
           >
             <ArrowRight className="w-6 h-6" />
           </button>
-          
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2">
-            {carouselItems.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  if (!isAnimating && index !== currentIndex) {
-                    setIsAnimating(true);
-                    setCurrentIndex(index);
-                    setBackgroundColor(carouselItems[index].color);
-                    setTimeout(() => setIsAnimating(false), 300); // Reduced from 500ms to 300ms
-                  }
-                }}
-                className={`h-2 w-2 rounded-full transition-colors duration-300 ${
-                  index === currentIndex ? 'bg-white' : 'bg-white/50'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
         </>
       )}
     </div>
