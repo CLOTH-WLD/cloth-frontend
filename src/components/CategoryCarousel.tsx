@@ -61,15 +61,14 @@ const CategoryCarousel: React.FC = () => {
         opts={{
           loop: true,
           duration: 20,
-          animation: 'fade'
         }}
       >
         <CarouselContent>
           {carouselItems.map((item, index) => (
             <CarouselItem key={item.id} className="transition-opacity duration-500">
-              <div className={`${item.bgColor} relative w-full h-[90vh] md:h-[600px] text-white`}>
+              <div className={`${item.bgColor} relative w-full h-[80vh] md:h-[450px] text-white`}>
                 <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
-                  <h1 className="text-lg md:text-xl font-helvetica mb-4 md:mb-6">{item.title}</h1>
+                  <h1 className="text-lg font-helvetica mb-4 md:mb-6">{item.title}</h1>
                   
                   <div className="flex space-x-2 md:space-x-4">
                     {ctaButtons.map((btn) => (
@@ -84,11 +83,11 @@ const CategoryCarousel: React.FC = () => {
                     ))}
                   </div>
                   
-                  <div className="flex-1 relative mt-6">
+                  <div className="flex-1 relative mt-6 flex justify-end">
                     <img 
                       src={item.image} 
                       alt={`${item.id} category`} 
-                      className="w-full h-full object-cover"
+                      className="h-full max-h-[60vh] md:max-h-[350px] object-cover"
                     />
                   </div>
                   
