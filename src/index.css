@@ -1,5 +1,23 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Font imports for Helvetica Now and Tiempos (using system fonts as fallbacks) */
+@font-face {
+  font-family: 'HelveticaNow';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'HelveticaNow';
+  src: local('Helvetica Neue Bold'), local('Arial Bold');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Tiempos';
+  src: local('Times New Roman');
+  font-weight: normal;
+}
 
 @tailwind base;
 @tailwind components;

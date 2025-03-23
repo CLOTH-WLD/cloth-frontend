@@ -10,6 +10,7 @@ import {
   CarouselPrevious 
 } from '@/components/ui/carousel';
 import { Button } from './ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const carouselItems = [
   {
@@ -43,35 +44,32 @@ const carouselItems = [
 
 const CategoryCarousel: React.FC = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleCategoryClick = (category: string) => {
     navigate(`/?category=${category.toLowerCase()}`);
   };
 
   return (
-    <div className="w-full mb-12">
+    <div className="w-full mb-8">
       <Carousel className="w-full">
         <CarouselContent>
           {carouselItems.map((item) => (
             <CarouselItem key={item.id}>
-              <div className={`${item.bgColor} relative w-full h-[600px] text-white`}>
-                <div className="absolute inset-0 z-10 p-8 flex flex-col">
-                  <h1 className="text-3xl font-bold mb-6">{item.title}</h1>
+              <div className={`${item.bgColor} relative w-full h-[90vh] md:h-[600px] text-white`}>
+                <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
+                  <h1 className="text-lg md:text-xl font-helvetica mb-4 md:mb-6">{item.title}</h1>
                   
-                  <div className="flex space-x-4 mb-6">
-                    {carouselItems.map((btn) => (
-                      <Button
-                        key={btn.id}
-                        variant="outline"
-                        className={`bg-black hover:bg-black/80 text-white border-none ${btn.id === item.id ? 'opacity-100' : 'opacity-70'}`}
-                        onClick={() => handleCategoryClick(btn.id)}
-                      >
-                        {btn.buttonText}
-                      </Button>
-                    ))}
-                  </div>
+                  <Button
+                    key={item.id}
+                    variant="outline"
+                    className="self-start bg-black hover:bg-black/80 text-white border-none"
+                    onClick={() => handleCategoryClick(item.id)}
+                  >
+                    {item.buttonText}
+                  </Button>
                   
-                  <div className="flex-1 relative">
+                  <div className="flex-1 relative mt-6">
                     <img 
                       src={item.image} 
                       alt={item.buttonText} 
@@ -80,8 +78,8 @@ const CategoryCarousel: React.FC = () => {
                   </div>
                   
                   <div className="pt-4">
-                    <h2 className="text-2xl font-bold mb-2">{item.subtitle}</h2>
-                    <p className="text-lg">{item.description}</p>
+                    <h2 className="text-xl md:text-2xl font-bold font-helvetica mb-2">{item.subtitle}</h2>
+                    <p className="text-base md:text-xl font-tiempos">{item.description}</p>
                   </div>
                 </div>
               </div>
@@ -89,8 +87,8 @@ const CategoryCarousel: React.FC = () => {
           ))}
         </CarouselContent>
         
-        <CarouselPrevious className="left-4 z-20 bg-black/50 text-white hover:bg-black/70 border-none" />
-        <CarouselNext className="right-4 z-20 bg-black/50 text-white hover:bg-black/70 border-none" />
+        <CarouselPrevious className="left-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
+        <CarouselNext className="right-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
       </Carousel>
     </div>
   );
