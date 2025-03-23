@@ -45,12 +45,12 @@ const CategoryGrid: React.FC = () => {
   return (
     <div className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
       <h2 className="text-2xl font-semibold mb-6">Favorite categories</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => handleCategoryClick(category)}
-            className="text-left p-3 hover:bg-cloth-lightbeige transition-colors rounded-md"
+            className="text-left p-2 hover:bg-cloth-lightbeige transition-colors rounded-md font-helvetica text-sm"
           >
             {category}
           </button>
