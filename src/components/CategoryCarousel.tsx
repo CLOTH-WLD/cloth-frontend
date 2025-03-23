@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -83,14 +83,7 @@ const CategoryCarousel: React.FC = () => {
     }, 300); // Reduced from 500ms to 300ms for quicker animation
   }, [isAnimating, currentIndex]);
 
-  // Auto-advance carousel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      goToNextSlide();
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [goToNextSlide]);
+  // Auto-advance carousel removed
 
   return (
     <div className="w-full mb-8 category-carousel relative">
@@ -99,14 +92,14 @@ const CategoryCarousel: React.FC = () => {
         style={{ backgroundColor }}
       >
         <div className="absolute inset-0 z-10 pt-4 pl-4 pb-4 pr-0 flex flex-col text-white">
-          <h1 className="text-lg font-helvetica mb-4 md:mb-6">{carouselItems[currentIndex].title}</h1>
+          <h1 className="text-lg font-helvetica font-bold text-black mb-4 md:mb-6">{carouselItems[currentIndex].title}</h1>
           
           <div className="flex space-x-2 md:space-x-4">
             {ctaButtons.map((btn) => (
               <Button
                 key={btn.id}
                 variant="outline"
-                className="bg-black hover:bg-black/80 text-white border-none"
+                className="bg-black hover:bg-black/80 text-white border-none font-helvetica font-bold"
                 onClick={() => handleCategoryClick(btn.id)}
               >
                 {btn.buttonText}

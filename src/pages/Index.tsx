@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
@@ -6,7 +7,6 @@ import { Product } from '@/types/product';
 import { getAllProducts } from '@/services/productService';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CategoryFilter from '@/components/CategoryFilter';
 import CategoryCarousel from '@/components/CategoryCarousel';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
 import CategoryGrid from '@/components/CategoryGrid';
@@ -63,13 +63,11 @@ const Index: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="mb-8"
           >
-            <h1 className="text-2xl font-semibold tracking-tight">New Collection</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">Recommended For You</h1>
             <p className="text-cloth-mediumgray mt-2">
               Discover our newest arrivals for the season
             </p>
           </motion.div>
-          
-          <CategoryFilter />
           
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
