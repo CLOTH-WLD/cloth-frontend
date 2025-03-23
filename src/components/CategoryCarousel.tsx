@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -44,9 +43,10 @@ const CategoryCarousel: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, duration: 20 });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, duration: 20, dragFree: false });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleCategoryClick = (category: string) => {
     navigate(`/?category=${category.toLowerCase()}`);
@@ -77,7 +77,7 @@ const CategoryCarousel: React.FC = () => {
   }, [emblaApi, onSelect]);
 
   return (
-    <div className="w-full mb-8">
+    <div className="w-full mb-8 category-carousel">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {carouselItems.map((item, index) => (

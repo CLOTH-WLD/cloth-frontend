@@ -9,6 +9,9 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CategoryFilter from '@/components/CategoryFilter';
 import CategoryCarousel from '@/components/CategoryCarousel';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
+import CategoryGrid from '@/components/CategoryGrid';
+import NotificationBanner from '@/components/NotificationBanner';
 
 const Index: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -49,7 +52,12 @@ const Index: React.FC = () => {
       
       <main className="flex-1">
         {/* Hero Carousel */}
-        <CategoryCarousel />
+        <div className="category-carousel">
+          <CategoryCarousel />
+        </div>
+        
+        {/* Category Grid */}
+        <CategoryGrid />
         
         {/* Products Section */}
         <div className="py-6 px-4 sm:px-6 max-w-7xl mx-auto">
@@ -91,9 +99,15 @@ const Index: React.FC = () => {
             </div>
           )}
         </div>
+        
+        {/* Notification Banner */}
+        <NotificationBanner />
       </main>
       
       <Footer />
+      
+      {/* Scroll to Top Button */}
+      <ScrollToTopButton />
     </div>
   );
 };
