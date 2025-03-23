@@ -40,7 +40,7 @@ const CategoryCarousel: React.FC = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: false,
     duration: 20,
-    draggable: false, // Disable dragging for fade effect
+    dragFree: false, // Use 'dragFree' instead of 'draggable'
   });
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
