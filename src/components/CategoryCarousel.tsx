@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -16,16 +16,14 @@ const carouselItems = [
   {
     id: 'women',
     title: 'Where do you want to start?',
-    buttonText: 'Women',
     subtitle: 'What will I wear?',
     description: 'With the new season comes a new collection full of stylish pieces for your wardrobe.',
     bgColor: 'bg-[#4285F4]', // Blue
-    image: '/lovable-uploads/6603031a-dbcb-422d-afff-9411a7338d54.png'
+    image: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=1600&h=900'
   },
   {
     id: 'men',
     title: 'Where do you want to start?',
-    buttonText: 'Men',
     subtitle: 'Style that defines you',
     description: 'Discover the latest trends for men with our new seasonal collection.',
     bgColor: 'bg-[#34A853]', // Green
@@ -34,7 +32,6 @@ const carouselItems = [
   {
     id: 'kids',
     title: 'Where do you want to start?',
-    buttonText: 'Kids',
     subtitle: 'Fun and colorful choices',
     description: 'Playful designs and comfortable clothes for the little ones.',
     bgColor: 'bg-[#FBBC05]', // Yellow
@@ -45,34 +42,52 @@ const carouselItems = [
 const CategoryCarousel: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleCategoryClick = (category: string) => {
     navigate(`/?category=${category.toLowerCase()}`);
   };
 
+  const ctaButtons = [
+    { id: 'women', buttonText: 'Women' },
+    { id: 'men', buttonText: 'Men' },
+    { id: 'kids', buttonText: 'Kids' }
+  ];
+
   return (
     <div className="w-full mb-8">
-      <Carousel className="w-full">
+      <Carousel 
+        className="w-full" 
+        opts={{
+          loop: true,
+          duration: 20,
+          animation: 'fade'
+        }}
+      >
         <CarouselContent>
-          {carouselItems.map((item) => (
-            <CarouselItem key={item.id}>
+          {carouselItems.map((item, index) => (
+            <CarouselItem key={item.id} className="transition-opacity duration-500">
               <div className={`${item.bgColor} relative w-full h-[90vh] md:h-[600px] text-white`}>
                 <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
                   <h1 className="text-lg md:text-xl font-helvetica mb-4 md:mb-6">{item.title}</h1>
                   
-                  <Button
-                    key={item.id}
-                    variant="outline"
-                    className="self-start bg-black hover:bg-black/80 text-white border-none"
-                    onClick={() => handleCategoryClick(item.id)}
-                  >
-                    {item.buttonText}
-                  </Button>
+                  <div className="flex space-x-2 md:space-x-4">
+                    {ctaButtons.map((btn) => (
+                      <Button
+                        key={btn.id}
+                        variant="outline"
+                        className="bg-black hover:bg-black/80 text-white border-none"
+                        onClick={() => handleCategoryClick(btn.id)}
+                      >
+                        {btn.buttonText}
+                      </Button>
+                    ))}
+                  </div>
                   
                   <div className="flex-1 relative mt-6">
                     <img 
                       src={item.image} 
-                      alt={item.buttonText} 
+                      alt={`${item.id} category`} 
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -87,8 +102,12 @@ const CategoryCarousel: React.FC = () => {
           ))}
         </CarouselContent>
         
-        <CarouselPrevious className="left-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
-        <CarouselNext className="right-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
+        {carouselItems.length > 1 && (
+          <>
+            <CarouselPrevious className="left-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
+            <CarouselNext className="right-4 z-20 bg-white text-black hover:bg-white/90 border-none h-10 w-10 rounded-none" />
+          </>
+        )}
       </Carousel>
     </div>
   );
