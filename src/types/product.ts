@@ -20,6 +20,7 @@ export interface ProductColor {
   name: string;
   value: string;
   image: string;
+  id?: string; // Added ID to allow navigation to specific product
 }
 
 export interface ProductVariant {

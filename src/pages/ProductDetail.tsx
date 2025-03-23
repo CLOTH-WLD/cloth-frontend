@@ -5,16 +5,14 @@ import { motion } from 'framer-motion';
 import { getProductById, toggleFavorite } from '@/services/productService';
 import { Product, ProductColor } from '@/types/product';
 import { useCart } from '@/context/CartContext';
-import { ArrowLeft, ChevronLeft, ChevronRight, Heart, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Heart, ShoppingBag } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { formatCurrency } from '@/services/paymentService';
 import { 
   Carousel, 
   CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
+  CarouselItem
 } from '@/components/ui/carousel';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from '@/components/ui/button';
@@ -99,12 +97,9 @@ const ProductDetail: React.FC = () => {
   }, [product, toast]);
   
   const handleColorChange = (color: ProductColor) => {
-    setSelectedColor(color);
-    
-    // Find the index of the image that matches the color
-    const colorImageIndex = product?.images?.findIndex(img => img === color.image) ?? 0;
-    if (colorImageIndex !== -1) {
-      setCurrentImageIndex(colorImageIndex);
+    if (color.name !== selectedColor?.name) {
+      // Navigate to the product associated with this color
+      navigate(`/product/${color.id || id}`);
     }
   };
   
@@ -112,6 +107,11 @@ const ProductDetail: React.FC = () => {
   const imagesToDisplay = selectedColor && product?.images 
     ? [selectedColor.image, ...product.images.filter(img => img !== selectedColor.image)]
     : product?.images || [product?.image || ''];
+  
+  const handleCarouselChange = (emblaApi: any) => {
+    const index = emblaApi.selectedScrollSnap();
+    setCurrentImageIndex(index);
+  };
   
   if (loading) {
     return (
@@ -154,7 +154,7 @@ const ProductDetail: React.FC = () => {
             transition={{ duration: 0.4 }}
             className="relative"
           >
-            <Carousel className="w-full relative">
+            <Carousel className="w-full relative" onSelect={handleCarouselChange}>
               <CarouselContent>
                 {imagesToDisplay.map((image, index) => (
                   <CarouselItem key={index}>
@@ -184,13 +184,6 @@ const ProductDetail: React.FC = () => {
                   className={`h-5 w-5 ${product.isFavorite ? 'text-red-500 fill-red-500' : 'text-black'}`} 
                 />
               </Button>
-              
-              <CarouselPrevious className="left-2" onClick={() => {
-                setCurrentImageIndex(prev => (prev > 0 ? prev - 1 : imagesToDisplay.length - 1));
-              }} />
-              <CarouselNext className="right-2" onClick={() => {
-                setCurrentImageIndex(prev => (prev < imagesToDisplay.length - 1 ? prev + 1 : 0));
-              }} />
             </Carousel>
           </motion.div>
           
