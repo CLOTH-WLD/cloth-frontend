@@ -51,13 +51,12 @@ const Navbar: React.FC = () => {
           <div className="flex-1 relative">
             <Input 
               placeholder="Search" 
-              className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12"
             />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <Search className="w-6 h-6" />
+            </div>
           </div>
-          
-          <button className="px-5 py-3">
-            <Search className="w-6 h-6" />
-          </button>
         </div>
       </div>
     </header>
