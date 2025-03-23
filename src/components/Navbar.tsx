@@ -12,7 +12,7 @@ const Navbar: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b">
+    <header className="bg-white border-b">
       {/* Top row with logo and icons */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
         <Link to="/" className="flex items-center space-x-2">
