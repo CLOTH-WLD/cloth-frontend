@@ -26,6 +26,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
     console.log('Added to favorites:', product.title);
   };
   
+  // Truncate title to 36 characters and add ellipsis if needed
+  const truncateTitle = (title: string) => {
+    if (title.length <= 36) return title;
+    return title.substring(0, 36) + '...';
+  };
+  
   return (
     <motion.div
       className="product-card flex flex-col subtle-shadow"
@@ -60,7 +66,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           )}
         </div>
         <div className="p-4 flex flex-col space-y-2">
-          <h3 className="font-helvetica text-sm leading-tight h-10 overflow-hidden line-clamp-2">{product.title}</h3>
+          <h3 className="font-helvetica text-sm leading-tight h-10">{truncateTitle(product.title)}</h3>
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium">
               {formatCurrency(discountedPrice)}
