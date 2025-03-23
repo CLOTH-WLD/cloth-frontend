@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getProductById, toggleFavorite } from '@/services/productService';
@@ -17,7 +17,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
-import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 const ProductDetail: React.FC = () => {
@@ -30,6 +29,7 @@ const ProductDetail: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addToCart } = useCart();
   const { toast } = useToast();
+  const emblaApiRef = useRef<any>(null);
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -108,10 +108,16 @@ const ProductDetail: React.FC = () => {
     ? [selectedColor.image, ...product.images.filter(img => img !== selectedColor.image)]
     : product?.images || [product?.image || ''];
   
-  const handleCarouselChange = (emblaApi: any) => {
-    const index = emblaApi.selectedScrollSnap();
+  // This function will update the currentImageIndex when the carousel slides
+  const onCarouselSelect = useCallback((api: any) => {
+    if (!api) return;
+    
+    const index = api.selectedScrollSnap();
     setCurrentImageIndex(index);
-  };
+    
+    // Store the API reference
+    emblaApiRef.current = api;
+  }, []);
   
   if (loading) {
     return (
@@ -154,7 +160,11 @@ const ProductDetail: React.FC = () => {
             transition={{ duration: 0.4 }}
             className="relative"
           >
-            <Carousel className="w-full relative" onSelect={handleCarouselChange}>
+            <Carousel 
+              className="w-full relative" 
+              setApi={onCarouselSelect}
+              onSelect={onCarouselSelect}
+            >
               <CarouselContent>
                 {imagesToDisplay.map((image, index) => (
                   <CarouselItem key={index}>
