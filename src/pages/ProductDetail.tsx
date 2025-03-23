@@ -108,15 +108,24 @@ const ProductDetail: React.FC = () => {
     ? [selectedColor.image, ...product.images.filter(img => img !== selectedColor.image)]
     : product?.images || [product?.image || ''];
   
-  // This function will update the currentImageIndex when the carousel slides
-  const onCarouselSelect = useCallback((api: any) => {
+  // Set up the carousel API reference
+  const handleCarouselApi = useCallback((api: any) => {
     if (!api) return;
     
-    const index = api.selectedScrollSnap();
-    setCurrentImageIndex(index);
-    
-    // Store the API reference
     emblaApiRef.current = api;
+    
+    // Initial index
+    setCurrentImageIndex(api.selectedScrollSnap());
+    
+    // Add event listener for the select event
+    api.on('select', () => {
+      setCurrentImageIndex(api.selectedScrollSnap());
+    });
+    
+    // Cleanup on unmount
+    return () => {
+      api.off('select');
+    };
   }, []);
   
   if (loading) {
@@ -162,8 +171,7 @@ const ProductDetail: React.FC = () => {
           >
             <Carousel 
               className="w-full relative" 
-              setApi={onCarouselSelect}
-              onSelect={onCarouselSelect}
+              setApi={handleCarouselApi}
             >
               <CarouselContent>
                 {imagesToDisplay.map((image, index) => (
