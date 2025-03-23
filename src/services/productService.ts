@@ -12,6 +12,7 @@ const mockProducts: Product[] = [
     image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
     category: 'T-Shirts',
     inStock: true,
+    discountPercentage: 20,
   },
   {
     id: '2',
@@ -32,6 +33,7 @@ const mockProducts: Product[] = [
     image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
     category: 'Sweaters',
     inStock: true,
+    discountPercentage: 15,
   },
   {
     id: '4',
@@ -52,6 +54,7 @@ const mockProducts: Product[] = [
     image: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
     category: 'Accessories',
     inStock: true,
+    discountPercentage: 30,
   },
   {
     id: '6',
@@ -82,6 +85,7 @@ const mockProducts: Product[] = [
     image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
     category: 'Pants',
     inStock: true,
+    discountPercentage: 25,
   },
 ];
 

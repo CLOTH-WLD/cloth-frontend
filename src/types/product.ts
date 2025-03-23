@@ -8,6 +8,7 @@ export interface Product {
   image: string;
   category: string;
   inStock: boolean;
+  discountPercentage?: number;
   variants?: ProductVariant[];
 }
 
