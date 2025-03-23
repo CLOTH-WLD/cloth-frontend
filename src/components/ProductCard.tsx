@@ -48,7 +48,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
             variant="outline"
             aria-label="Add to favorites"
           >
-            <Heart className="h-5 w-5 text-black" />
+            <Heart 
+              className={`h-5 w-5 ${product.isFavorite ? 'text-red-500 fill-red-500' : 'text-black'}`} 
+            />
           </Button>
           
           {hasDiscount && (
@@ -58,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           )}
         </div>
         <div className="p-4 flex flex-col space-y-2">
-          <h3 className="font-medium text-sm truncate">{product.title}</h3>
+          <h3 className="font-helvetica text-sm leading-tight h-10 overflow-hidden line-clamp-2">{product.title}</h3>
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium">
               {formatCurrency(discountedPrice)}

@@ -9,6 +9,7 @@ export interface Product {
   category: string;
   inStock: boolean;
   discountPercentage?: number;
+  isFavorite?: boolean;
   variants?: ProductVariant[];
 }
 

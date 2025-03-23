@@ -13,6 +13,7 @@ const mockProducts: Product[] = [
     category: 'T-Shirts',
     inStock: true,
     discountPercentage: 20,
+    isFavorite: true,
   },
   {
     id: '2',
@@ -34,10 +35,11 @@ const mockProducts: Product[] = [
     category: 'Sweaters',
     inStock: true,
     discountPercentage: 15,
+    isFavorite: true,
   },
   {
     id: '4',
-    title: 'Lightweight Linen Shirt',
+    title: 'Lightweight Linen Shirt with Extra Long Product Name to Test Multi-line',
     description: 'Breathable linen shirt with a relaxed cut, perfect for warm weather.',
     price: 49.99,
     currency: 'USD',
