@@ -99,7 +99,7 @@ const CategoryCarousel: React.FC = () => {
               <Button
                 key={btn.id}
                 variant="outline"
-                className="bg-black hover:bg-black/80 text-white border-none font-helvetica font-bold"
+                className="bg-black hover:bg-black/80 text-white border-none font-helvetica font-bold w-24"
                 onClick={() => handleCategoryClick(btn.id)}
               >
                 {btn.buttonText}
