@@ -9,6 +9,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Success from "./pages/Success";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import Favorites from "./pages/Favorites";
 import { CartProvider } from "./context/CartContext";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/success" element={<Success />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
