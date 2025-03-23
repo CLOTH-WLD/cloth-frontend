@@ -13,6 +13,7 @@ const carouselItems = [
     subtitle: 'What will I wear?',
     description: 'With the new season comes a new collection full of stylish pieces for your wardrobe.',
     bgColor: 'bg-[#4285F4]', // Blue
+    color: '#4285F4', // Color value for animation
     image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&h=900'
   },
   {
@@ -21,6 +22,7 @@ const carouselItems = [
     subtitle: 'Style that defines you',
     description: 'Discover the latest trends for men with our new seasonal collection.',
     bgColor: 'bg-[#34A853]', // Green
+    color: '#34A853', // Color value for animation
     image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=1600&h=900'
   },
   {
@@ -29,6 +31,7 @@ const carouselItems = [
     subtitle: 'Fun and colorful choices',
     description: 'Playful designs and comfortable clothes for the little ones.',
     bgColor: 'bg-[#FBBC05]', // Yellow
+    color: '#FBBC05', // Color value for animation
     image: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=1600&h=900'
   }
 ];
@@ -38,6 +41,7 @@ const CategoryCarousel: React.FC = () => {
   const isMobile = useIsMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState(carouselItems[0].color);
 
   const handleCategoryClick = (category: string) => {
     navigate(`/?category=${category.toLowerCase()}`);
@@ -53,27 +57,31 @@ const CategoryCarousel: React.FC = () => {
     if (isAnimating) return;
     
     setIsAnimating(true);
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? carouselItems.length - 1 : prevIndex - 1
-    );
+    const newIndex = currentIndex === 0 ? carouselItems.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
+    
+    // Start background color transition
+    setBackgroundColor(carouselItems[newIndex].color);
     
     setTimeout(() => {
       setIsAnimating(false);
     }, 500); // Match this with animation duration
-  }, [isAnimating]);
+  }, [isAnimating, currentIndex]);
 
   const goToNextSlide = useCallback(() => {
     if (isAnimating) return;
     
     setIsAnimating(true);
-    setCurrentIndex((prevIndex) => 
-      prevIndex === carouselItems.length - 1 ? 0 : prevIndex + 1
-    );
+    const newIndex = currentIndex === carouselItems.length - 1 ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
+    
+    // Start background color transition
+    setBackgroundColor(carouselItems[newIndex].color);
     
     setTimeout(() => {
       setIsAnimating(false);
     }, 500); // Match this with animation duration
-  }, [isAnimating]);
+  }, [isAnimating, currentIndex]);
 
   // Auto-advance carousel
   useEffect(() => {
@@ -86,51 +94,56 @@ const CategoryCarousel: React.FC = () => {
 
   return (
     <div className="w-full mb-8 category-carousel relative">
-      <div className="overflow-hidden relative h-[80vh] md:h-[450px]">
-        <AnimatePresence mode="wait">
-          {carouselItems.map((item, index) => (
-            index === currentIndex && (
-              <motion.div
-                key={item.id}
+      <div 
+        className="overflow-hidden relative h-[80vh] md:h-[450px] transition-colors duration-1000"
+        style={{ backgroundColor }}
+      >
+        <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col text-white">
+          <h1 className="text-lg font-helvetica mb-4 md:mb-6">{carouselItems[currentIndex].title}</h1>
+          
+          <div className="flex space-x-2 md:space-x-4">
+            {ctaButtons.map((btn) => (
+              <Button
+                key={btn.id}
+                variant="outline"
+                className="bg-black hover:bg-black/80 text-white border-none"
+                onClick={() => handleCategoryClick(btn.id)}
+              >
+                {btn.buttonText}
+              </Button>
+            ))}
+          </div>
+          
+          <div className="flex-1 relative mt-6 flex justify-end pr-0 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.img 
+                key={`img-${currentIndex}`}
+                src={carouselItems[currentIndex].image} 
+                alt={`${carouselItems[currentIndex].id} category`} 
+                className="h-full max-h-[60vh] md:max-h-[350px] object-cover"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className={`absolute inset-0 ${item.bgColor} w-full h-full text-white`}
+              />
+            </AnimatePresence>
+          </div>
+          
+          <div className="pt-4 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`content-${currentIndex}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <div className="absolute inset-0 z-10 p-4 md:p-8 flex flex-col">
-                  <h1 className="text-lg font-helvetica mb-4 md:mb-6">{item.title}</h1>
-                  
-                  <div className="flex space-x-2 md:space-x-4">
-                    {ctaButtons.map((btn) => (
-                      <Button
-                        key={btn.id}
-                        variant="outline"
-                        className="bg-black hover:bg-black/80 text-white border-none"
-                        onClick={() => handleCategoryClick(btn.id)}
-                      >
-                        {btn.buttonText}
-                      </Button>
-                    ))}
-                  </div>
-                  
-                  <div className="flex-1 relative mt-6 flex justify-end pr-0">
-                    <img 
-                      src={item.image} 
-                      alt={`${item.id} category`} 
-                      className="h-full max-h-[60vh] md:max-h-[350px] object-cover"
-                    />
-                  </div>
-                  
-                  <div className="pt-4">
-                    <h2 className="text-xl md:text-2xl font-bold font-helvetica mb-2">{item.subtitle}</h2>
-                    <p className="text-base md:text-xl font-tiempos">{item.description}</p>
-                  </div>
-                </div>
+                <h2 className="text-xl md:text-2xl font-bold font-helvetica mb-2">{carouselItems[currentIndex].subtitle}</h2>
+                <p className="text-base md:text-xl font-tiempos">{carouselItems[currentIndex].description}</p>
               </motion.div>
-            )
-          ))}
-        </AnimatePresence>
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
       
       {carouselItems.length > 1 && (
@@ -159,6 +172,7 @@ const CategoryCarousel: React.FC = () => {
                   if (!isAnimating && index !== currentIndex) {
                     setIsAnimating(true);
                     setCurrentIndex(index);
+                    setBackgroundColor(carouselItems[index].color);
                     setTimeout(() => setIsAnimating(false), 500);
                   }
                 }}
