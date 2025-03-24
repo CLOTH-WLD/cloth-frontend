@@ -63,7 +63,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 )}
               </div>
               {!editingEmail && (
-                <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)} className="h-7 px-2">
+                <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)} className="h-7 w-7 p-0">
                   <Edit className="h-3.5 w-3.5" />
                 </Button>
               )}

@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatCurrency } from '@/services/paymentService';
+import { useNavigate } from 'react-router-dom';
 
 interface CartItemProps {
   item: CartItemType;
@@ -14,6 +15,15 @@ interface CartItemProps {
 const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
   const { updateQuantity, removeFromCart } = useCart();
   const { product, quantity } = item;
+  const navigate = useNavigate();
+  
+  const handleNavigateToProduct = () => {
+    navigate(`/product/${product.id}`);
+  };
+  
+  // Determine which properties to display
+  const hasSize = product.sizes && product.sizes.length > 0;
+  const hasColor = product.colors && product.colors.length > 0;
   
   return (
     <motion.div 
@@ -23,7 +33,10 @@ const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
       transition={{ duration: 0.3, delay: index * 0.1 }}
       exit={{ opacity: 0, x: -20 }}
     >
-      <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+      <div 
+        className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 cursor-pointer"
+        onClick={handleNavigateToProduct}
+      >
         <img
           src={product.image}
           alt={product.title}
@@ -33,10 +46,30 @@ const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
       
       <div className="ml-4 flex flex-1 flex-col">
         <div className="flex justify-between text-base font-medium">
-          <h3 className="text-sm">{product.title}</h3>
+          <h3 
+            className="text-sm cursor-pointer hover:underline"
+            onClick={handleNavigateToProduct}
+          >
+            {product.title}
+          </h3>
           <p className="ml-4 text-sm font-medium">
             {formatCurrency(product.price * quantity)}
           </p>
+        </div>
+        
+        {/* Show size and color if available */}
+        <div className="mt-1 text-xs text-gray-500">
+          {(hasSize || hasColor) && (
+            <div className="flex space-x-2">
+              {hasSize && (
+                <span>Size: {product.sizes?.[0]}</span>
+              )}
+              {hasColor && hasSize && <span>•</span>}
+              {hasColor && (
+                <span>Color: {product.colors?.[0].name}</span>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="flex items-center justify-between mt-2">

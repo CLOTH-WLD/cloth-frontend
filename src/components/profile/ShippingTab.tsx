@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Edit, Pencil } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
@@ -348,13 +347,13 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-start sm:justify-between space-y-2 sm:space-y-0">
         <div>
           <CardTitle>Shipping Details</CardTitle>
           <CardDescription>Your shipping information for orders</CardDescription>
         </div>
         {!editingShipping && (
-          <Button variant="outline" size="sm" onClick={() => setEditingShipping(true)}>
+          <Button variant="outline" size="sm" onClick={() => setEditingShipping(true)} className="self-start">
             <Pencil className="h-4 w-4 mr-2" />
             Edit
           </Button>
