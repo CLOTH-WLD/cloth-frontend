@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
             <SearchDrawer triggerRef={searchInputRef} />
             <Input 
               ref={searchInputRef}
-              placeholder="Search for products..." 
+              placeholder="Search" 
               readOnly
               className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
               onClick={() => searchInputRef.current?.click()}
