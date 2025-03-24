@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import BurgerMenu from './BurgerMenu';
 
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
@@ -42,11 +43,7 @@ const Navbar: React.FC = () => {
       {/* Bottom row with burger menu and search */}
       <div className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto flex items-center w-full">
-          <button className="px-5 py-3 flex flex-col space-y-1.5">
-            <div className="w-5 h-0.5 bg-black"></div>
-            <div className="w-5 h-0.5 bg-black"></div>
-            <div className="w-5 h-0.5 bg-black"></div>
-          </button>
+          <BurgerMenu />
           
           <div className="flex-1 relative">
             <Input 
