@@ -9,7 +9,6 @@ import ProfileTabs from '@/components/profile/ProfileTabs';
 import { Order } from '@/components/profile/OrdersTab';
 import { Voucher } from '@/components/profile/VouchersTab';
 
-// Mock data for demonstration purposes
 const mockProfile = {
   username: 'alex_miller',
   walletAddress: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
@@ -39,6 +38,7 @@ const mockVouchers: Voucher[] = [
 ];
 
 const Profile: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('shipping');
   const [editingShipping, setEditingShipping] = useState(false);
   const [shippingDetails, setShippingDetails] = useState(mockShipping);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -94,20 +94,18 @@ const Profile: React.FC = () => {
             
             {/* Main content area */}
             <div className="flex-1 flex flex-col gap-6">
-              {/* Shipping Details - Always Visible */}
-              <ShippingTab 
+              {/* Now using the updated ProfileTabs component with tabs */}
+              <ProfileTabs 
+                orders={mockOrders}
+                vouchers={mockVouchers}
+                isMobile={isMobile}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
                 shippingDetails={shippingDetails}
                 editingShipping={editingShipping}
                 setEditingShipping={setEditingShipping}
                 handleShippingUpdate={handleShippingUpdate}
                 handleInputChange={handleInputChange}
-              />
-              
-              {/* Orders and Vouchers */}
-              <ProfileTabs 
-                orders={mockOrders}
-                vouchers={mockVouchers}
-                isMobile={isMobile}
               />
             </div>
           </div>

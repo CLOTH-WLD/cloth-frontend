@@ -299,6 +299,53 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
 
   const selectedCountry = countryOptions.find(option => option.label === shippingDetails.country) || null;
 
+  // Custom styles for react-select to match other inputs
+  const customSelectStyles = {
+    control: (provided: any, state: any) => ({
+      ...provided,
+      height: '40px',
+      minHeight: '40px',
+      borderColor: state.isFocused ? 'hsl(var(--ring))' : 'hsl(var(--input))',
+      boxShadow: state.isFocused ? '0 0 0 2px hsl(var(--ring))' : 'none',
+      backgroundColor: 'hsl(var(--background))',
+      borderRadius: 'var(--radius)',
+      '&:hover': {
+        borderColor: state.isFocused ? 'hsl(var(--ring))' : 'hsl(var(--input))'
+      }
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: 'hsl(var(--background))',
+      borderRadius: 'var(--radius)',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+      zIndex: 9999
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? 'hsl(var(--accent))' : state.isFocused ? 'hsl(var(--accent))' : 'transparent',
+      color: state.isSelected ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
+      '&:hover': {
+        backgroundColor: 'hsl(var(--accent))',
+        color: 'hsl(var(--accent-foreground))'
+      }
+    }),
+    singleValue: (provided: any) => ({
+      ...provided,
+      color: 'hsl(var(--foreground))'
+    }),
+    input: (provided: any) => ({
+      ...provided,
+      color: 'hsl(var(--foreground))'
+    }),
+    placeholder: (provided: any) => ({
+      ...provided,
+      color: 'hsl(var(--muted-foreground))'
+    }),
+    indicatorSeparator: () => ({
+      display: 'none'
+    })
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between">
@@ -333,12 +380,37 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                   country={'us'}
                   value={shippingDetails.phone}
                   onChange={handlePhoneChange}
-                  inputClass="!w-full !h-10 !py-2 !px-3 !text-base md:!text-sm !rounded-md !border !border-input"
-                  buttonClass="!border !border-input !rounded-md"
+                  inputClass="!w-full !h-10 !py-2 !px-3 !text-base md:!text-sm !rounded-md !border !border-input !bg-background"
+                  buttonClass="!border !border-input !rounded-md !bg-background"
                   containerClass="!w-full"
-                  dropdownClass="!min-w-fit"
-                  buttonStyle={{ width: '58px' }}
-                  inputStyle={{ paddingLeft: '68px' }}
+                  dropdownClass="!bg-background !min-w-fit"
+                  buttonStyle={{ 
+                    width: '58px', 
+                    background: 'hsl(var(--background))', 
+                    borderTopRightRadius: 0, 
+                    borderBottomRightRadius: 0 
+                  }}
+                  inputStyle={{ 
+                    paddingLeft: '78px', 
+                    width: '100%', 
+                    background: 'hsl(var(--background))', 
+                    borderTopLeftRadius: 0, 
+                    borderBottomLeftRadius: 0 
+                  }}
+                  dropdownStyle={{ 
+                    background: 'hsl(var(--background))', 
+                    color: 'hsl(var(--foreground))', 
+                    borderRadius: 'var(--radius)',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    zIndex: 9999
+                  }}
+                  searchClass="!bg-background !text-foreground !border-input"
+                  searchStyle={{ 
+                    background: 'hsl(var(--background))', 
+                    color: 'hsl(var(--foreground))', 
+                    borderColor: 'hsl(var(--input))'
+                  }}
+                  enableSearch={true}
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
@@ -391,6 +463,7 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                   placeholder="Select country"
                   className="react-select-container"
                   classNamePrefix="react-select"
+                  styles={customSelectStyles}
                 />
               </div>
             </div>
