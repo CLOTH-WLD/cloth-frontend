@@ -3,6 +3,7 @@ import React from 'react';
 import { Package, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export interface Order {
   id: string;
@@ -16,6 +17,8 @@ interface OrdersTabProps {
 }
 
 const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
+  const navigate = useNavigate();
+
   return (
     <Card>
       <CardHeader>
@@ -49,7 +52,12 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
                 </div>
                 <div className="flex justify-between items-center mt-2">
                   <p className="font-medium">${order.total.toFixed(2)}</p>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-1"
+                    onClick={() => navigate(`/order/${order.id}`)}
+                  >
                     Details <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>

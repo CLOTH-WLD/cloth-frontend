@@ -46,6 +46,7 @@ const App = () => (
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/faq" element={<Faq />} />
               <Route path="/faq/:category" element={<Faq />} />
+              <Route path="/order/:orderId" element={<OrderDetail />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
