@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Input } from './ui/input';
 import { X, Search, ExternalLink } from 'lucide-react';
@@ -18,6 +18,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch all products for searching
   useEffect(() => {
@@ -27,6 +28,21 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
     };
     fetchProducts();
   }, []);
+
+  // Add delay when focusing the search input
+  useEffect(() => {
+    let focusTimeout: NodeJS.Timeout;
+    
+    if (open && searchInputRef.current) {
+      focusTimeout = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 300); // 300ms delay
+    }
+    
+    return () => {
+      if (focusTimeout) clearTimeout(focusTimeout);
+    };
+  }, [open]);
 
   // Handle search when user types
   useEffect(() => {
@@ -77,11 +93,11 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
               </button>
             </SheetClose>
             <Input 
+              ref={searchInputRef}
               placeholder="Search products..."
               className="flex-1 h-10 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              autoFocus
               aria-label="Search products"
             />
           </div>

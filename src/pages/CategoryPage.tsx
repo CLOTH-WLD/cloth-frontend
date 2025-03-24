@@ -1,150 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types/product';
-import { getProductsByCategory } from '@/services/productService';
+import { getProductsByCategory, getAllProducts } from '@/services/productService';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
 import NotificationBanner from '@/components/NotificationBanner';
-import { Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Filter, SlidersHorizontal, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-
-// FilterSheet component
-interface FilterSheetProps {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-}
-
-const FilterSheet: React.FC<FilterSheetProps> = ({ open, onClose, title, children }) => {
-  return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="h-[80vh] px-0 overflow-y-auto rounded-t-xl">
-        <SheetHeader className="px-4 sticky top-0 bg-white z-10 border-b pb-4">
-          <div className="flex items-center justify-between">
-            <SheetTitle>{title}</SheetTitle>
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </SheetClose>
-          </div>
-        </SheetHeader>
-        {children}
-        <div className="sticky bottom-0 p-4 bg-white border-t mt-auto">
-          <SheetClose asChild>
-            <Button className="w-full" onClick={onClose}>
-              Apply
-            </Button>
-          </SheetClose>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-};
-
-// FilterCheckbox component
-interface FilterCheckboxProps {
-  id: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  label: string;
-}
-
-const FilterCheckbox: React.FC<FilterCheckboxProps> = ({ 
-  id, 
-  checked, 
-  onCheckedChange, 
-  label 
-}) => {
-  return (
-    <div className="flex items-center space-x-2">
-      <Checkbox 
-        id={id} 
-        checked={checked} 
-        onCheckedChange={onCheckedChange} 
-      />
-      <label 
-        htmlFor={id}
-        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      >
-        {label}
-      </label>
-    </div>
-  );
-};
-
-// PriceRangeFilter component
-interface PriceRangeFilterProps {
-  min: number;
-  max: number;
-  value: [number, number];
-  onChange: (value: [number, number]) => void;
-}
-
-const PriceRangeFilter: React.FC<PriceRangeFilterProps> = ({
-  min,
-  max,
-  value,
-  onChange
-}) => {
-  return (
-    <div className="px-2">
-      <Slider
-        defaultValue={[value[0], value[1]]}
-        value={[value[0], value[1]]}
-        max={max}
-        min={min}
-        step={1}
-        onValueChange={(newValue) => onChange([newValue[0], newValue[1]])}
-        className="mb-4"
-      />
-      <div className="flex justify-between text-sm">
-        <span>${value[0]}</span>
-        <span>${value[1]}</span>
-      </div>
-    </div>
-  );
-};
-
-// SortRadioGroup component
-interface SortRadioGroupProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-}
-
-const SortRadioGroup: React.FC<SortRadioGroupProps> = ({
-  value,
-  onChange,
-  options
-}) => {
-  return (
-    <RadioGroup value={value} onValueChange={onChange} className="space-y-3">
-      {options.map((option) => (
-        <div key={option.value} className="flex items-center space-x-2">
-          <RadioGroupItem value={option.value} id={option.value} />
-          <Label htmlFor={option.value}>{option.label}</Label>
-        </div>
-      ))}
-    </RadioGroup>
-  );
-};
+import FilterSheet from '@/components/FilterSheet';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const CategoryPage: React.FC = () => {
   const { category } = useParams<{ category: string }>();
@@ -152,6 +26,7 @@ const CategoryPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [similarCategories, setSimilarCategories] = useState<string[]>([]);
   
   // Filter states
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
@@ -162,6 +37,10 @@ const CategoryPage: React.FC = () => {
   
   // Filter sheet state
   const [openSheet, setOpenSheet] = useState<string | null>(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 50;
   
   // Get all available filters from products
   const allColors = React.useMemo(() => {
@@ -208,6 +87,26 @@ const CategoryPage: React.FC = () => {
         const data = await getProductsByCategory(decodedCategory);
         setProducts(data);
         setFilteredProducts(data);
+
+        // Reset pagination when category changes
+        setCurrentPage(1);
+        
+        // Fetch similar categories
+        const allProducts = await getAllProducts();
+        const categoriesSet = new Set<string>();
+        allProducts.forEach(product => {
+          // Get the main category type (e.g., "women's clothing" from "women's evening dresses")
+          const mainCategory = product.category.split(' ')[0].toLowerCase();
+          const currentMainCategory = decodedCategory.split(' ')[0].toLowerCase();
+          
+          if (
+            mainCategory === currentMainCategory && 
+            product.category !== decodedCategory
+          ) {
+            categoriesSet.add(product.category);
+          }
+        });
+        setSimilarCategories(Array.from(categoriesSet).slice(0, 5));
       } catch (error) {
         console.error('Failed to fetch products:', error);
       } finally {
@@ -278,6 +177,9 @@ const CategoryPage: React.FC = () => {
     
     setFilteredProducts(filtered);
     
+    // Reset to first page when filters change
+    setCurrentPage(1);
+    
   }, [products, priceRange, selectedColors, selectedSizes, sortBy, showDiscountedOnly]);
 
   const clearAllFilters = () => {
@@ -297,6 +199,27 @@ const CategoryPage: React.FC = () => {
   const activeFiltersCount = selectedColors.length + selectedSizes.length + (showDiscountedOnly ? 1 : 0);
   const isPriceRangeChanged = priceRange[0] !== priceRange2[0] || priceRange[1] !== priceRange2[1];
   const totalActiveFilters = activeFiltersCount + (isPriceRangeChanged ? 1 : 0);
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const currentProducts = filteredProducts.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  );
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -377,12 +300,19 @@ const CategoryPage: React.FC = () => {
                 <X className="h-3 w-3 ml-1" />
               </Button>
             )}
+          </div>
+          
+          {/* Product count and Clear All row */}
+          <div className="flex justify-between items-center py-3 mb-2">
+            <p className="text-sm text-cloth-mediumgray">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+            </p>
             
             {totalActiveFilters > 0 && (
               <Button 
                 variant="ghost"
                 size="sm"
-                className="whitespace-nowrap text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 onClick={clearAllFilters}
               >
                 Clear all
@@ -404,14 +334,14 @@ const CategoryPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-            ) : filteredProducts.length > 0 ? (
+            ) : currentProducts.length > 0 ? (
               <motion.div 
                 className="grid grid-cols-2 gap-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4 }}
               >
-                {filteredProducts.map((product, index) => (
+                {currentProducts.map((product, index) => (
                   <ProductCard key={product.id} product={product} index={index} />
                 ))}
               </motion.div>
@@ -427,6 +357,51 @@ const CategoryPage: React.FC = () => {
               </div>
             )}
           </div>
+          
+          {/* Pagination */}
+          {filteredProducts.length > 0 && totalPages > 1 && (
+            <div className="mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={handlePreviousPage}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  <PaginationItem>
+                    <span className="px-4 py-2">Page {currentPage} of {totalPages}</span>
+                  </PaginationItem>
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={handleNextPage} 
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+          
+          {/* Similar Categories */}
+          {similarCategories.length > 0 && (
+            <div className="mt-12 border-t pt-8">
+              <h2 className="text-xl font-semibold mb-4">Similar Categories</h2>
+              <div className="flex flex-wrap gap-2">
+                {similarCategories.map(similarCategory => (
+                  <Link 
+                    key={similarCategory}
+                    to={`/category/${encodeURIComponent(similarCategory)}`}
+                    className="px-4 py-2 bg-cloth-lightbeige rounded-full text-sm hover:bg-cloth-beige transition-colors"
+                  >
+                    {similarCategory}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Filter Sheets */}
@@ -439,7 +414,7 @@ const CategoryPage: React.FC = () => {
             {/* Price Range Filter */}
             <div className="border-b pb-4">
               <h3 className="text-sm font-medium mb-4">Price Range</h3>
-              <PriceRangeFilter 
+              <FilterSheet.PriceRange 
                 min={priceRange2[0]}
                 max={priceRange2[1]}
                 value={priceRange}
@@ -449,7 +424,7 @@ const CategoryPage: React.FC = () => {
             
             {/* Discounted Items Only */}
             <div className="border-b pb-4">
-              <FilterCheckbox
+              <FilterSheet.Checkbox
                 id="discounted-only"
                 checked={showDiscountedOnly}
                 onCheckedChange={setShowDiscountedOnly}
@@ -463,7 +438,7 @@ const CategoryPage: React.FC = () => {
                 <h3 className="text-sm font-medium mb-4">Colors</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {allColors.map((color) => (
-                    <FilterCheckbox
+                    <FilterSheet.Checkbox
                       key={color}
                       id={`color-${color}`}
                       checked={selectedColors.includes(color)}
@@ -518,7 +493,7 @@ const CategoryPage: React.FC = () => {
           title="Sort By"
         >
           <div className="p-4">
-            <SortRadioGroup
+            <FilterSheet.RadioGroup
               value={sortBy}
               onChange={setSortBy}
               options={[
@@ -540,7 +515,7 @@ const CategoryPage: React.FC = () => {
         >
           <div className="p-4 grid grid-cols-2 gap-2">
             {allColors.map((color) => (
-              <FilterCheckbox
+              <FilterSheet.Checkbox
                 key={color}
                 id={`sheet-color-${color}`}
                 checked={selectedColors.includes(color)}
@@ -595,7 +570,7 @@ const CategoryPage: React.FC = () => {
           title="Price Range"
         >
           <div className="p-4">
-            <PriceRangeFilter 
+            <FilterSheet.PriceRange 
               min={priceRange2[0]}
               max={priceRange2[1]}
               value={priceRange}
