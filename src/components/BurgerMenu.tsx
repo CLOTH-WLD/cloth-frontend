@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { X } from 'lucide-react';
+import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -52,7 +52,7 @@ const BurgerMenu: React.FC = () => {
       </SheetTrigger>
       <SheetContent side="left" className="w-full p-0 sm:max-w-full border-none">
         <div className="h-full flex flex-col bg-white">
-          {/* Header with only one close button */}
+          {/* Header */}
           <div className="flex justify-between items-center p-4 border-b">
             <span className="text-xl font-semibold">Cloth</span>
             <button onClick={() => setOpen(false)}>

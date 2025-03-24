@@ -1,13 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, User, Heart } from 'lucide-react';
+import { ShoppingBag, User, Heart, Search } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { motion } from 'framer-motion';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 import BurgerMenu from './BurgerMenu';
-import SearchDrawer from './SearchDrawer';
 
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
+  const [showSearch, setShowSearch] = useState(false);
   
   return (
     <header className="bg-white border-b">
@@ -42,8 +45,14 @@ const Navbar: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center w-full">
           <BurgerMenu />
           
-          <div className="flex-1 flex items-center justify-end h-12 px-4">
-            <SearchDrawer />
+          <div className="flex-1 relative">
+            <Input 
+              placeholder="Search" 
+              className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12"
+            />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <Search className="w-6 h-6" />
+            </div>
           </div>
         </div>
       </div>
