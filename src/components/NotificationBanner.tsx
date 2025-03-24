@@ -21,7 +21,7 @@ const NotificationBanner: React.FC = () => {
   };
 
   return (
-    <div className="bg-cloth-lightbeige py-12 px-4 sm:px-6 my-8">
+    <div className="bg-cloth-beige py-12 px-4 sm:px-6 my-8">
       <motion.div 
         className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6"
         initial={{ opacity: 0, y: 20 }}
