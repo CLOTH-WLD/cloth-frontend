@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -43,7 +44,16 @@ const Profile: React.FC = () => {
   const [shippingDetails, setShippingDetails] = useState(mockShipping);
   const [editingEmail, setEditingEmail] = useState(false);
   const [email, setEmail] = useState(mockProfile.email);
+  const [userPreference, setUserPreference] = useState('general');
   const isMobile = useIsMobile();
+  
+  useEffect(() => {
+    // Load user preference from localStorage
+    const storedPreference = localStorage.getItem('userPreference');
+    if (storedPreference) {
+      setUserPreference(storedPreference);
+    }
+  }, []);
   
   const handleShippingUpdate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +116,8 @@ const Profile: React.FC = () => {
                 setEditingShipping={setEditingShipping}
                 handleShippingUpdate={handleShippingUpdate}
                 handleInputChange={handleInputChange}
+                userPreference={userPreference}
+                setUserPreference={setUserPreference}
               />
             </div>
           </div>

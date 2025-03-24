@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OrdersTab, { Order } from './OrdersTab';
 import VouchersTab, { Voucher } from './VouchersTab';
 import ShippingTab, { ShippingDetails } from './ShippingTab';
+import PreferencesTab from './PreferencesTab';
 
 interface ProfileTabsProps {
   orders: Order[];
@@ -16,6 +17,8 @@ interface ProfileTabsProps {
   setEditingShipping: (value: boolean) => void;
   handleShippingUpdate: (e: React.FormEvent) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  userPreference: string;
+  setUserPreference: (value: string) => void;
 }
 
 const ProfileTabs: React.FC<ProfileTabsProps> = ({
@@ -28,12 +31,15 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   editingShipping,
   setEditingShipping,
   handleShippingUpdate,
-  handleInputChange
+  handleInputChange,
+  userPreference,
+  setUserPreference
 }) => {
   return (
     <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="shipping">Shipping</TabsTrigger>
+        <TabsTrigger value="preferences">Preferences</TabsTrigger>
         <TabsTrigger value="orders">Orders</TabsTrigger>
         <TabsTrigger value="vouchers">Vouchers</TabsTrigger>
       </TabsList>
@@ -45,6 +51,13 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           setEditingShipping={setEditingShipping}
           handleShippingUpdate={handleShippingUpdate}
           handleInputChange={handleInputChange}
+        />
+      </TabsContent>
+      
+      <TabsContent value="preferences" className="mt-4">
+        <PreferencesTab 
+          userPreference={userPreference}
+          setUserPreference={setUserPreference}
         />
       </TabsContent>
       

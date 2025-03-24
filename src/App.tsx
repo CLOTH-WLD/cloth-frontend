@@ -14,6 +14,9 @@ import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import Faq from "./pages/Faq";
 import OrderDetail from "./pages/OrderDetail";
+import WomenLanding from "./pages/WomenLanding";
+import MenLanding from "./pages/MenLanding";
+import KidsLanding from "./pages/KidsLanding";
 import { CartProvider } from "./context/CartContext";
 
 // ScrollToTop component to handle scrolling to top on route change
@@ -40,6 +43,9 @@ const App = () => (
           <div>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/women" element={<WomenLanding />} />
+              <Route path="/men" element={<MenLanding />} />
+              <Route path="/kids" element={<KidsLanding />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/success" element={<Success />} />

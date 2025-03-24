@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -44,7 +44,23 @@ const CategoryCarousel: React.FC = () => {
   const [backgroundColor, setBackgroundColor] = useState(carouselItems[0].color);
 
   const handleCategoryClick = (category: string) => {
-    navigate(`/?category=${category.toLowerCase()}`);
+    // Save user preference
+    localStorage.setItem('userPreference', category.toLowerCase());
+    
+    // Navigate to the appropriate landing page
+    switch(category.toLowerCase()) {
+      case 'women':
+        navigate('/women');
+        break;
+      case 'men':
+        navigate('/men');
+        break;
+      case 'kids':
+        navigate('/kids');
+        break;
+      default:
+        navigate(`/?category=${category.toLowerCase()}`);
+    }
   };
 
   const ctaButtons = [
@@ -86,6 +102,30 @@ const CategoryCarousel: React.FC = () => {
   // Check if current slide is first or last
   const isFirstSlide = currentIndex === 0;
   const isLastSlide = currentIndex === carouselItems.length - 1;
+  
+  // Check for stored preference and redirect on initial load
+  useEffect(() => {
+    const storedPreference = localStorage.getItem('userPreference');
+    if (storedPreference) {
+      // Wait a short time to avoid immediate redirect
+      const timer = setTimeout(() => {
+        switch(storedPreference) {
+          case 'women':
+            navigate('/women');
+            break;
+          case 'men':
+            navigate('/men');
+            break;
+          case 'kids':
+            navigate('/kids');
+            break;
+          // Default case does nothing (stays on current page)
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [navigate]);
 
   return (
     <div className="w-full mb-8 category-carousel relative">

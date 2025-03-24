@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -34,6 +35,21 @@ const Footer: React.FC = () => {
               <li>
                 <Link to="/" className="text-cloth-mediumgray hover:text-cloth-charcoal transition-colors">
                   Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/women" className="text-cloth-mediumgray hover:text-cloth-charcoal transition-colors">
+                  Women
+                </Link>
+              </li>
+              <li>
+                <Link to="/men" className="text-cloth-mediumgray hover:text-cloth-charcoal transition-colors">
+                  Men
+                </Link>
+              </li>
+              <li>
+                <Link to="/kids" className="text-cloth-mediumgray hover:text-cloth-charcoal transition-colors">
+                  Kids
                 </Link>
               </li>
               <li>

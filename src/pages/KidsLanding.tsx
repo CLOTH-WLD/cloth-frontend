@@ -1,46 +1,28 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types/product';
 import { getAllProducts } from '@/services/productService';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CategoryCarousel from '@/components/CategoryCarousel';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
-import CategoryGrid from '@/components/CategoryGrid';
 import NotificationBanner from '@/components/NotificationBanner';
+import { useEffect, useState } from 'react';
+import CategoryList from '@/components/CategoryList';
 
-const Index: React.FC = () => {
+const KidsLanding: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const categoryFilter = searchParams.get('category');
-  const navigate = useNavigate();
   
   useEffect(() => {
-    // Check for user preference and redirect if needed
-    const preference = localStorage.getItem('userPreference');
-    if (preference && preference !== 'general') {
-      switch(preference) {
-        case 'women':
-          navigate('/women');
-          return;
-        case 'men':
-          navigate('/men');
-          return;
-        case 'kids':
-          navigate('/kids');
-          return;
-        default:
-          // Stay on this page
-          break;
-      }
-    }
+    // Save the preference locally
+    localStorage.setItem('userPreference', 'kids');
     
-    // Fetch products if we're still on this page
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -54,39 +36,56 @@ const Index: React.FC = () => {
     };
     
     fetchProducts();
-  }, [navigate]);
+  }, []);
   
   useEffect(() => {
+    // Filter products for kids
+    const kidsProducts = products.filter(product => 
+      product.category.toLowerCase().includes('kid')
+    );
+    
     if (categoryFilter && categoryFilter !== 'all') {
-      setFilteredProducts(products.filter(product => 
+      setFilteredProducts(kidsProducts.filter(product => 
         product.category.toLowerCase().includes(categoryFilter.toLowerCase())
       ));
     } else {
-      setFilteredProducts(products);
+      setFilteredProducts(kidsProducts);
     }
   }, [products, categoryFilter]);
+  
+  const kidsCategories = [
+    "Kids' hats",
+    "Kids' clothing",
+    "Kids' shoes",
+    "Kids' accessories",
+    "Kids' backpacks",
+    "Kids' outerwear"
+  ];
   
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-1">
-        {/* Hero Carousel */}
-        <div className="category-carousel">
-          <CategoryCarousel />
+        {/* Banner */}
+        <div className="bg-[#FEF7CD] py-16 px-4">
+          <div className="max-w-7xl mx-auto text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">Kids' Collection</h1>
+            <p className="text-lg">Fun & comfortable clothes for the little ones</p>
+          </div>
         </div>
         
-        {/* Products Section */}
-        <div className="py-6 px-4 sm:px-6 max-w-7xl mx-auto">
+        {/* Recommended Products Section */}
+        <div className="py-10 px-4 sm:px-6 max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="mb-8"
           >
-            <h1 className="text-2xl font-semibold tracking-tight">Recommended For You</h1>
+            <h2 className="text-2xl font-semibold tracking-tight">Recommended For Kids</h2>
             <p className="text-cloth-mediumgray mt-2">
-              Discover our newest arrivals for the season
+              Playful designs they'll love to wear
             </p>
           </motion.div>
           
@@ -104,7 +103,7 @@ const Index: React.FC = () => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {filteredProducts.map((product, index) => (
+              {filteredProducts.slice(0, 8).map((product, index) => (
                 <ProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
@@ -115,8 +114,26 @@ const Index: React.FC = () => {
           )}
         </div>
         
-        {/* Favorite Categories Grid */}
-        <CategoryGrid />
+        {/* Fun & Colorful Section */}
+        <div className="py-10 px-4 sm:px-6 max-w-7xl mx-auto bg-cloth-lightbeige">
+          <h2 className="text-2xl font-semibold tracking-tight mb-8">Fun & Colorful</h2>
+          {!loading && products.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {products
+                .filter(product => product.category.toLowerCase().includes('kid'))
+                .slice(8, 16)
+                .map((product, index) => (
+                  <ProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Kids' Favorite Categories */}
+        <div className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-6">Kids' Favorite Categories</h2>
+          <CategoryList categories={kidsCategories} />
+        </div>
         
         {/* Notification Banner */}
         <NotificationBanner />
@@ -130,4 +147,4 @@ const Index: React.FC = () => {
   );
 };
 
-export default Index;
+export default KidsLanding;
