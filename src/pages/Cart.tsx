@@ -6,7 +6,7 @@ import { useCart } from '@/context/CartContext';
 import CartItem from '@/components/CartItem';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { formatCurrency, initiatePayment } from '@/services/paymentService';
 import { ShippingDetails } from '@/components/profile/ShippingTab';
 import { 
@@ -77,6 +77,13 @@ const Cart: React.FC = () => {
     }
   };
   
+  // Check if shipping details are not filled completely
+  const isShippingIncomplete = !shippingValid;
+  
+  const handleCartItemClick = (productId: string) => {
+    navigate(`/product/${productId}`);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -114,7 +121,9 @@ const Cart: React.FC = () => {
             <AnimatePresence>
               <div className="space-y-2">
                 {items.map((item, index) => (
-                  <CartItem key={item.product.id} item={item} index={index} />
+                  <div key={item.product.id} onClick={() => handleCartItemClick(item.product.id)} className="cursor-pointer">
+                    <CartItem item={item} index={index} />
+                  </div>
                 ))}
               </div>
             </AnimatePresence>
@@ -125,93 +134,108 @@ const Cart: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
-              <Accordion type="single" collapsible className="w-full border rounded-md">
-                <AccordionItem value="shipping">
-                  <AccordionTrigger className="px-4 py-3">
-                    <span className="font-medium">Shipping Information</span>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="fullName">Full Name</Label>
-                        <Input 
-                          id="fullName" 
-                          name="fullName" 
-                          value={shippingDetails.fullName} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your full name"
-                          required 
-                        />
+              {isShippingIncomplete && (
+                <Accordion type="single" collapsible defaultValue="shipping" className="w-full border rounded-md">
+                  <AccordionItem value="shipping">
+                    <AccordionTrigger className="px-4 py-3">
+                      <span className="font-medium">Shipping Information</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="fullName">Full Name</Label>
+                          <Input 
+                            id="fullName" 
+                            name="fullName" 
+                            value={shippingDetails.fullName} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your full name"
+                            required 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone</Label>
+                          <Input 
+                            id="phone" 
+                            name="phone" 
+                            value={shippingDetails.phone} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your phone number"
+                          />
+                        </div>
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label htmlFor="address">Street Address</Label>
+                          <Input 
+                            id="address" 
+                            name="address" 
+                            value={shippingDetails.address} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your street address"
+                            required 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="city">City</Label>
+                          <Input 
+                            id="city" 
+                            name="city" 
+                            value={shippingDetails.city} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your city"
+                            required 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="state">State/Province</Label>
+                          <Input 
+                            id="state" 
+                            name="state" 
+                            value={shippingDetails.state} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your state"
+                            required 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="zipCode">ZIP/Postal Code</Label>
+                          <Input 
+                            id="zipCode" 
+                            name="zipCode" 
+                            value={shippingDetails.zipCode} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your ZIP code"
+                            required 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="country">Country</Label>
+                          <Input 
+                            id="country" 
+                            name="country" 
+                            value={shippingDetails.country} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter your country"
+                            required 
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input 
-                          id="phone" 
-                          name="phone" 
-                          value={shippingDetails.phone} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your phone number"
-                        />
-                      </div>
-                      <div className="space-y-2 sm:col-span-2">
-                        <Label htmlFor="address">Street Address</Label>
-                        <Input 
-                          id="address" 
-                          name="address" 
-                          value={shippingDetails.address} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your street address"
-                          required 
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="city">City</Label>
-                        <Input 
-                          id="city" 
-                          name="city" 
-                          value={shippingDetails.city} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your city"
-                          required 
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="state">State/Province</Label>
-                        <Input 
-                          id="state" 
-                          name="state" 
-                          value={shippingDetails.state} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your state"
-                          required 
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="zipCode">ZIP/Postal Code</Label>
-                        <Input 
-                          id="zipCode" 
-                          name="zipCode" 
-                          value={shippingDetails.zipCode} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your ZIP code"
-                          required 
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="country">Country</Label>
-                        <Input 
-                          id="country" 
-                          name="country" 
-                          value={shippingDetails.country} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter your country"
-                          required 
-                        />
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              )}
+              
+              {!isShippingIncomplete && (
+                <div className="w-full border rounded-md p-4">
+                  <h3 className="font-medium mb-2">Shipping To:</h3>
+                  <div className="text-sm text-cloth-mediumgray">
+                    <p>{shippingDetails.fullName}</p>
+                    <p>{shippingDetails.address}</p>
+                    <p>{shippingDetails.city}, {shippingDetails.state} {shippingDetails.zipCode}</p>
+                    <p>{shippingDetails.country}</p>
+                    {shippingDetails.phone && <p>Phone: {shippingDetails.phone}</p>}
+                  </div>
+                </div>
+              )}
               
               <div className="pt-4 border-t">
                 <div className="flex justify-between mb-2">
