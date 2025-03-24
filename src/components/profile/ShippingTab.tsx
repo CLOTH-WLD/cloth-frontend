@@ -380,7 +380,7 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                   country={'us'}
                   value={shippingDetails.phone}
                   onChange={handlePhoneChange}
-                  inputClass="!w-full !h-10 !py-2 !px-3 !text-base md:!text-sm !rounded-md !border !border-input !bg-background"
+                  inputClass="!w-full !h-10 !py-2 !text-base md:!text-sm !rounded-md !border !border-input !bg-background"
                   buttonClass="!border !border-input !rounded-md !bg-background"
                   containerClass="!w-full"
                   dropdownClass="!bg-background !min-w-fit"
@@ -391,7 +391,7 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                     borderBottomRightRadius: 0 
                   }}
                   inputStyle={{ 
-                    paddingLeft: '90px', // Increased padding to ensure number is not hiding under the flag
+                    paddingLeft: '65px',
                     width: '100%', 
                     background: 'hsl(var(--background))', 
                     borderTopLeftRadius: 0, 
@@ -410,7 +410,7 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                     color: 'hsl(var(--foreground))', 
                     borderColor: 'hsl(var(--input))'
                   }}
-                  enableSearch={true}
+                  enableSearch={false}
                   containerStyle={{
                     width: '100%'
                   }}
