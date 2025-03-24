@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -55,9 +56,9 @@ const CategoryPage: React.FC = () => {
   
   // Get minimum and maximum price
   const priceRange2 = React.useMemo(() => {
-    if (!products.length) return [0, 100];
+    if (!products.length) return [0, 100] as [number, number];
     const prices = products.map(p => p.price);
-    return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))];
+    return [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))] as [number, number];
   }, [products]);
   
   useEffect(() => {
