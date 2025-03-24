@@ -83,7 +83,9 @@ const CategoryCarousel: React.FC = () => {
     }, 300); // Reduced from 500ms to 300ms for quicker animation
   }, [isAnimating, currentIndex]);
 
-  // Auto-advance carousel removed
+  // Check if current slide is first or last
+  const isFirstSlide = currentIndex === 0;
+  const isLastSlide = currentIndex === carouselItems.length - 1;
 
   return (
     <div className="w-full mb-8 category-carousel relative">
@@ -109,16 +111,20 @@ const CategoryCarousel: React.FC = () => {
           
           <div className="flex-1 relative mt-6 flex justify-end pr-0 overflow-hidden">
             <AnimatePresence mode="wait">
-              <motion.img 
+              <motion.div 
                 key={`img-${currentIndex}`}
-                src={carouselItems[currentIndex].image} 
-                alt={`${carouselItems[currentIndex].id} category`} 
-                className="h-full max-h-[60vh] md:max-h-[350px] object-cover"
+                className="h-full flex items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }} // Reduced from 0.5s to 0.3s
-              />
+                transition={{ duration: 0.3 }}
+              >
+                <img 
+                  src={carouselItems[currentIndex].image} 
+                  alt={`${carouselItems[currentIndex].id} category`} 
+                  className="h-full max-h-[350px] object-cover w-auto" 
+                />
+              </motion.div>
             </AnimatePresence>
           </div>
           
@@ -129,7 +135,7 @@ const CategoryCarousel: React.FC = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }} // Reduced from 0.5s to 0.3s
+                transition={{ duration: 0.3 }}
               >
                 <h2 className="text-xl md:text-2xl font-bold font-helvetica mb-2">{carouselItems[currentIndex].subtitle}</h2>
                 <p className="text-base md:text-xl font-tiempos">{carouselItems[currentIndex].description}</p>
@@ -141,21 +147,25 @@ const CategoryCarousel: React.FC = () => {
       
       {carouselItems.length > 1 && (
         <>
-          <button 
-            onClick={goToPrevSlide} 
-            disabled={isAnimating}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
+          {!isFirstSlide && (
+            <button 
+              onClick={goToPrevSlide} 
+              disabled={isAnimating}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+          )}
           
-          <button 
-            onClick={goToNextSlide}
-            disabled={isAnimating}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
-          >
-            <ArrowRight className="w-6 h-6" />
-          </button>
+          {!isLastSlide && (
+            <button 
+              onClick={goToNextSlide}
+              disabled={isAnimating}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 bg-white text-black hover:bg-white/90 h-10 w-10 flex items-center justify-center disabled:opacity-50"
+            >
+              <ArrowRight className="w-6 h-6" />
+            </button>
+          )}
         </>
       )}
     </div>

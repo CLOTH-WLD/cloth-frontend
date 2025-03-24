@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User, Wallet, ExternalLink, Edit } from 'lucide-react';
+import { User, Wallet, Edit } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,23 +52,24 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <p className="text-sm font-medium">Wallet Address</p>
               <p className="text-sm text-gray-500 truncate">{truncateWalletAddress(walletAddress)}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => navigator.clipboard.writeText(walletAddress)} title="Copy full address">
-              <ExternalLink className="h-4 w-4" />
-            </Button>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <User className="h-5 w-5 text-gray-500 shrink-0" />
-              <p className="text-sm font-medium">Email</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Email</p>
+                {!editingEmail && (
+                  <p className="text-sm text-gray-500">{email || 'Not set'}</p>
+                )}
+              </div>
               {!editingEmail && (
-                <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)} className="ml-auto h-7 px-2">
-                  <Edit className="h-3.5 w-3.5 mr-1" />
-                  {email ? 'Edit' : 'Add'}
+                <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)} className="h-7 px-2">
+                  <Edit className="h-3.5 w-3.5" />
                 </Button>
               )}
             </div>
             
-            {editingEmail ? (
+            {editingEmail && (
               <form onSubmit={handleEmailUpdate} className="space-y-2">
                 <Input 
                   value={email} 
@@ -83,8 +84,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   <Button type="submit" size="sm">Save</Button>
                 </div>
               </form>
-            ) : (
-              <p className="text-sm text-gray-500">{email || 'Not set'}</p>
             )}
           </div>
         </div>
