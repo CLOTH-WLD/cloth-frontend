@@ -98,14 +98,14 @@ const Index: React.FC = () => {
         {/* Favorite Categories Grid */}
         <CategoryGrid />
         
-        {/* FAQ Accordion Section */}
-        <div className="bg-cloth-lightbeige py-4">
-          <FAQAccordion />
-        </div>
-        
         {/* Notification Banner */}
         <NotificationBanner />
       </main>
+      
+      {/* FAQ Accordion Section - Now positioned right before the footer */}
+      <div className="bg-cloth-lightbeige py-4 mt-auto">
+        <FAQAccordion />
+      </div>
       
       <Footer />
       
