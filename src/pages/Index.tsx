@@ -102,8 +102,8 @@ const Index: React.FC = () => {
         <NotificationBanner />
       </main>
       
-      {/* FAQ Accordion Section - Now positioned right before the footer */}
-      <div className="bg-cloth-lightbeige py-4 mt-auto">
+      {/* FAQ Accordion Section - Directly before footer with reduced spacing */}
+      <div className="bg-cloth-lightbeige py-0">
         <FAQAccordion />
       </div>
       
