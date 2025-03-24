@@ -11,6 +11,7 @@ import CategoryCarousel from '@/components/CategoryCarousel';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
 import CategoryGrid from '@/components/CategoryGrid';
 import NotificationBanner from '@/components/NotificationBanner';
+import FAQAccordion from '@/components/FAQAccordion';
 
 const Index: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -96,6 +97,11 @@ const Index: React.FC = () => {
         
         {/* Favorite Categories Grid */}
         <CategoryGrid />
+        
+        {/* FAQ Accordion Section */}
+        <div className="bg-cloth-lightbeige py-4">
+          <FAQAccordion />
+        </div>
         
         {/* Notification Banner */}
         <NotificationBanner />
