@@ -56,7 +56,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
+    <DrawerTrigger asChild>
+      <div className="relative w-full">
         <Input 
           ref={triggerRef}
           placeholder="Search" 
@@ -64,7 +65,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
           className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
           onClick={() => setOpen(true)}
         />
-      </DrawerTrigger>
+      </div>
+    </DrawerTrigger>
       <DrawerContent className="h-[90vh] rounded-t-[20px] p-0">
         <div className="h-full flex flex-col overflow-hidden bg-white">
           {/* Search header */}
