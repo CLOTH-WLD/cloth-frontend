@@ -12,7 +12,7 @@ const CategoryList: React.FC<CategoryListProps> = ({ categories }) => {
   const handleCategoryClick = (category: string) => {
     // Convert the category to a URL-friendly format
     const formattedCategory = category.toLowerCase().replace(/['']/g, '').replace(/\s+/g, '-');
-    navigate(`/?category=${formattedCategory}`);
+    navigate(`/category/${formattedCategory}`);
   };
 
   return (

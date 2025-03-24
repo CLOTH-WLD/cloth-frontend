@@ -67,12 +67,12 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
         />
       </div>
     </DrawerTrigger>
-      <DrawerContent className="h-[90vh] rounded-t-[20px] p-0">
+      <DrawerContent className="h-[80vh] rounded-t-[20px] p-0 mx-auto max-w-md">
         <div className="h-full flex flex-col overflow-hidden bg-white">
           {/* Search header */}
-          <div className="p-4 flex items-center gap-3 border-b">
+          <div className="p-4 flex items-center gap-3 border-b sticky top-0 bg-white z-10">
             <DrawerClose asChild>
-              <button onClick={handleClose}>
+              <button onClick={handleClose} aria-label="Close search">
                 <X className="h-6 w-6" />
               </button>
             </DrawerClose>
@@ -82,6 +82,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               autoFocus
+              aria-label="Search products"
             />
           </div>
           
@@ -116,10 +117,10 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
                             onClick={handleClose}
                           >
                             <div className="flex items-center gap-3">
-                              <Search className="h-5 w-5 text-gray-500" />
+                              <Search className="h-5 w-5 text-gray-500 shrink-0" />
                               <span className="font-bold text-black">{product.title}</span>
                             </div>
-                            <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-black transition-colors" />
+                            <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
                           </Link>
                           {index < searchResults.length - 1 && <hr className="border-gray-100" />}
                         </motion.div>
