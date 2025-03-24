@@ -1,17 +1,17 @@
 
 import React from 'react';
-import { MapPin, Package, CreditCard } from 'lucide-react';
+import { MapPin, Package, Ticket } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ShippingTab, { ShippingDetails } from './ShippingTab';
 import OrdersTab, { Order } from './OrdersTab';
-import TransactionsTab, { Transaction } from './TransactionsTab';
+import VouchersTab, { Voucher } from './VouchersTab';
 
 interface ProfileTabsProps {
   activeTab: string;
   setActiveTab: (value: string) => void;
   shippingDetails: ShippingDetails;
   orders: Order[];
-  transactions: Transaction[];
+  vouchers: Voucher[];
   editingShipping: boolean;
   setEditingShipping: (value: boolean) => void;
   handleShippingUpdate: (e: React.FormEvent) => void;
@@ -24,7 +24,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   setActiveTab,
   shippingDetails,
   orders,
-  transactions,
+  vouchers,
   editingShipping,
   setEditingShipping,
   handleShippingUpdate,
@@ -33,18 +33,14 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-3'} mb-4`}>
-        <TabsTrigger value="shipping" className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          <span>Shipping</span>
-        </TabsTrigger>
+      <TabsList className={`grid ${isMobile ? 'grid-cols-1 gap-2' : 'grid-cols-2'} mb-4`}>
         <TabsTrigger value="orders" className="flex items-center gap-2">
           <Package className="h-4 w-4" />
           <span>Orders</span>
         </TabsTrigger>
-        <TabsTrigger value="transactions" className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4" />
-          <span>Transactions</span>
+        <TabsTrigger value="vouchers" className="flex items-center gap-2">
+          <Ticket className="h-4 w-4" />
+          <span>Vouchers</span>
         </TabsTrigger>
       </TabsList>
       
@@ -62,8 +58,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         <OrdersTab orders={orders} />
       </TabsContent>
       
-      <TabsContent value="transactions">
-        <TransactionsTab transactions={transactions} />
+      <TabsContent value="vouchers">
+        <VouchersTab vouchers={vouchers} />
       </TabsContent>
     </Tabs>
   );

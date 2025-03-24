@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Package } from 'lucide-react';
+import { Package, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export interface Order {
   id: string;
@@ -23,45 +22,39 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
         <CardTitle>Your Orders</CardTitle>
         <CardDescription>View and manage your orders</CardDescription>
       </CardHeader>
-      <CardContent className="px-0 sm:px-6 overflow-x-auto">
+      <CardContent>
         {orders.length > 0 ? (
-          <div className="min-w-full">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {orders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.id}</TableCell>
-                    <TableCell>{order.date}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          <div className="grid grid-cols-1 gap-4">
+            {orders.map((order) => (
+              <div key={order.id} className="rounded-lg border p-4 hover:shadow-sm transition-shadow">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-0">
+                    <Package className="h-5 w-5 text-gray-400" />
+                    <h3 className="font-medium">Order {order.id}</h3>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+                    <p className="text-sm text-gray-500">{order.date}</p>
+                    <span 
+                      className={`mt-1 sm:mt-0 inline-flex w-fit px-2 py-1 rounded-full text-xs font-medium ${
                         order.status === 'Delivered' 
                           ? 'bg-green-100 text-green-800' 
                           : order.status === 'Shipped' 
                             ? 'bg-blue-100 text-blue-800' 
                             : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" className="whitespace-nowrap">
-                        Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="font-medium">${order.total.toFixed(2)}</p>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                    Details <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-6">

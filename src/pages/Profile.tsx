@@ -5,10 +5,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
+import ShippingTab, { ShippingDetails } from '@/components/profile/ShippingTab';
 import ProfileTabs from '@/components/profile/ProfileTabs';
-import { ShippingDetails } from '@/components/profile/ShippingTab';
 import { Order } from '@/components/profile/OrdersTab';
-import { Transaction } from '@/components/profile/TransactionsTab';
+import { Voucher } from '@/components/profile/VouchersTab';
 
 // Mock data for demonstration purposes
 const mockProfile = {
@@ -33,14 +33,14 @@ const mockOrders: Order[] = [
   { id: 'ORD-9012', date: '2023-08-05', status: 'Processing', total: 64.75 },
 ];
 
-const mockTransactions: Transaction[] = [
-  { id: 'TRX-1234', date: '2023-10-15', type: 'Purchase', amount: -89.99, status: 'Completed' },
-  { id: 'TRX-5678', date: '2023-09-22', type: 'Purchase', amount: -125.50, status: 'Completed' },
-  { id: 'TRX-9012', date: '2023-09-15', type: 'Refund', amount: 35.25, status: 'Completed' },
+const mockVouchers: Voucher[] = [
+  { id: 'VCHR-001', code: 'WELCOME20', discount: '20%', expiry: '2023-12-31', isActive: true },
+  { id: 'VCHR-002', code: 'SUMMER10', discount: '10%', expiry: '2023-10-30', isActive: false },
+  { id: 'VCHR-003', code: 'FREESHIP', discount: 'Free Shipping', expiry: '2023-11-15', isActive: true },
 ];
 
 const Profile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('shipping');
+  const [activeTab, setActiveTab] = useState('orders');
   const [editingShipping, setEditingShipping] = useState(false);
   const [shippingDetails, setShippingDetails] = useState(mockShipping);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -82,7 +82,7 @@ const Profile: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* User summary card */}
             <ProfileHeader 
               username={mockProfile.username}
@@ -94,14 +94,24 @@ const Profile: React.FC = () => {
               handleEmailUpdate={handleEmailUpdate}
             />
             
-            {/* Main content area with tabs */}
-            <div className="flex-1">
+            {/* Main content area */}
+            <div className="flex-1 flex flex-col gap-6">
+              {/* Shipping Details - Always Visible */}
+              <ShippingTab 
+                shippingDetails={shippingDetails}
+                editingShipping={editingShipping}
+                setEditingShipping={setEditingShipping}
+                handleShippingUpdate={handleShippingUpdate}
+                handleInputChange={handleInputChange}
+              />
+              
+              {/* Orders and Vouchers Tabs */}
               <ProfileTabs 
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 shippingDetails={shippingDetails}
                 orders={mockOrders}
-                transactions={mockTransactions}
+                vouchers={mockVouchers}
                 editingShipping={editingShipping}
                 setEditingShipping={setEditingShipping}
                 handleShippingUpdate={handleShippingUpdate}
