@@ -19,6 +19,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Fetch all products for searching
   useEffect(() => {
@@ -29,22 +30,29 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
     fetchProducts();
   }, []);
 
-  // Focus the search input after the drawer is opened with a delay to avoid keyboard issues
+  // Track drawer open state for proper focus handling
+  useEffect(() => {
+    setIsDrawerOpen(open);
+  }, [open]);
+
+  // Focus the search input after the drawer is fully opened
   useEffect(() => {
     let focusTimeout: NodeJS.Timeout;
     
-    if (open && searchInputRef.current) {
-      // First delay to allow the sheet to animate open
+    if (isDrawerOpen && searchInputRef.current) {
+      // Use a longer delay to ensure animation is complete
       focusTimeout = setTimeout(() => {
-        // Then focus the input
-        searchInputRef.current?.focus();
-      }, 300); // 300ms delay
+        if (searchInputRef.current) {
+          console.log('Focusing search input');
+          searchInputRef.current.focus();
+        }
+      }, 500); // 500ms delay to ensure animation is complete
     }
     
     return () => {
       if (focusTimeout) clearTimeout(focusTimeout);
     };
-  }, [open]);
+  }, [isDrawerOpen]);
 
   // Handle search when user types
   useEffect(() => {
@@ -72,8 +80,19 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
     setSearchTerm('');
   };
 
+  // Manual focus handler to ensure focus works
+  const handleSheetOpenChange = (open: boolean) => {
+    setOpen(open);
+    if (open) {
+      // Try to focus immediately as a backup
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  };
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetTrigger asChild>
         <div className="relative w-full">
           <Input 
@@ -101,6 +120,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               aria-label="Search products"
+              autoFocus
             />
           </div>
           
