@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -62,7 +61,21 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-cloth-lightgray text-center text-xs text-cloth-mediumgray">
-          <p>&copy; {new Date().getFullYear()} Cloth. All rights reserved.</p>
+          <div className="flex justify-center space-x-4">
+            <Link to="/tos" className="hover:text-cloth-charcoal transition-colors">
+              Terms of Service
+            </Link>
+            <Link to="/privacy-policy" className="hover:text-cloth-charcoal transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/refund-policy" className="hover:text-cloth-charcoal transition-colors">
+              Refund Policy
+            </Link>
+            <Link to="/shipping-policy" className="hover:text-cloth-charcoal transition-colors">
+              Shipping Policy
+            </Link>
+          </div>
+          <p className='mt-8'>&copy; {new Date().getFullYear()} Cloth. All rights reserved.</p>
         </div>
       </div>
     </motion.footer>

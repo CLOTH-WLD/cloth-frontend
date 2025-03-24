@@ -122,7 +122,7 @@ const CategoryCarousel: React.FC = () => {
                 <img 
                   src={carouselItems[currentIndex].image} 
                   alt={`${carouselItems[currentIndex].id} category`} 
-                  className="h-full max-h-[350px] object-cover w-auto" 
+                  className="h-full max-h-[435px] object-cover w-auto" 
                 />
               </motion.div>
             </AnimatePresence>
