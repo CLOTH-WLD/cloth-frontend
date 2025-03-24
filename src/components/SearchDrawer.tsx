@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from '@/components/ui/drawer';
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Input } from './ui/input';
 import { X, Search, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -55,30 +55,30 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
   };
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-    <DrawerTrigger asChild>
-      <div className="relative w-full">
-        <Input 
-          ref={triggerRef}
-          placeholder="Search" 
-          readOnly
-          className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
-          onClick={() => setOpen(true)}
-        />
-      </div>
-    </DrawerTrigger>
-      <DrawerContent className="h-[80vh] rounded-t-[20px] p-0 mx-auto max-w-md">
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <div className="relative w-full">
+          <Input 
+            ref={triggerRef}
+            placeholder="Search" 
+            readOnly
+            className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
+            onClick={() => setOpen(true)}
+          />
+        </div>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="h-[60vh] max-h-[60vh] p-0 rounded-t-[20px]">
         <div className="h-full flex flex-col overflow-hidden bg-white">
           {/* Search header */}
           <div className="p-4 flex items-center gap-3 border-b sticky top-0 bg-white z-10">
-            <DrawerClose asChild>
-              <button onClick={handleClose} aria-label="Close search">
-                <X className="h-6 w-6" />
+            <SheetClose asChild>
+              <button onClick={handleClose} aria-label="Close search" className="p-1">
+                <X className="h-5 w-5" />
               </button>
-            </DrawerClose>
+            </SheetClose>
             <Input 
               placeholder="Search products..."
-              className="flex-1 h-12 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="flex-1 h-10 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               autoFocus
@@ -118,7 +118,7 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
                           >
                             <div className="flex items-center gap-3">
                               <Search className="h-5 w-5 text-gray-500 shrink-0" />
-                              <span className="font-bold text-black">{product.title}</span>
+                              <span className="font-medium text-black">{product.title}</span>
                             </div>
                             <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
                           </Link>
@@ -132,8 +132,8 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
             )}
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 };
 
