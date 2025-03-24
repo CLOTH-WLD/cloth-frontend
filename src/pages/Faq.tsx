@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -98,17 +99,81 @@ const faqCategories = [
 const Faq: React.FC = () => {
   const { category } = useParams<{ category?: string }>();
   const navigate = useNavigate();
-  const activeCategoryId = category || "shipping";
   
-  const activeCategory = faqCategories.find(cat => cat.id === activeCategoryId) || faqCategories[0];
-  
+  // If category doesn't exist in our list, redirect to main FAQ page
   useEffect(() => {
-    // If category doesn't exist, redirect to shipping
     if (category && !faqCategories.some(cat => cat.id === category)) {
-      navigate('/faq/shipping');
+      navigate('/faq');
     }
   }, [category, navigate]);
 
+  // If we're on the main FAQ page (no category)
+  if (!category) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        
+        <main className="flex-1 py-8 px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-6xl mx-auto"
+          >
+            <h1 className="text-3xl font-bold mb-8 text-center">Help Center</h1>
+            
+            {/* Category Cards for main page */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {faqCategories.map((cat) => (
+                <Link to={`/faq/${cat.id}`} key={cat.id}>
+                  <Card className="hover:shadow-lg transition-all duration-300 h-full border-0">
+                    <CardContent className={`p-6 flex flex-col items-center text-center ${cat.color} rounded-lg h-full`}>
+                      <div className="mb-4 p-4 bg-white rounded-full shadow-md">
+                        {cat.icon}
+                      </div>
+                      <h3 className="font-bold text-xl mb-3">{cat.name}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{cat.description}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-auto border-gray-300 hover:bg-white/80"
+                      >
+                        View Details <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-8 mb-8">
+              <h2 className="text-2xl font-bold mb-6 text-center">Common Questions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {faqCategories.flatMap(cat => 
+                  cat.questions.slice(0, 1).map((q, idx) => (
+                    <div key={`${cat.id}-${idx}`} className="bg-white p-5 rounded-lg shadow-sm hover:shadow-md transition-all">
+                      <h3 className="text-lg font-medium mb-2">{q.question}</h3>
+                      <p className="text-gray-600 mb-3">{q.answer}</p>
+                      <Link to={`/faq/${cat.id}`} className="text-blue-600 hover:underline flex items-center">
+                        More about {cat.name} <ArrowRight className="ml-1 h-4 w-4" />
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </main>
+        
+        <Footer />
+      </div>
+    );
+  }
+  
+  // If we're on a specific category page
+  const activeCategory = faqCategories.find(cat => cat.id === category);
+  if (!activeCategory) return null; // This shouldn't happen due to the redirect
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -120,41 +185,28 @@ const Faq: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="max-w-6xl mx-auto"
         >
-          <h1 className="text-3xl font-bold mb-8 text-center">Help Center</h1>
-          
-          {/* Category Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-            {faqCategories.map((cat) => (
-              <Link to={`/faq/${cat.id}`} key={cat.id}>
-                <Card className={`hover:shadow-md transition-all duration-300 h-full ${activeCategoryId === cat.id ? 'ring-2 ring-cloth-charcoal' : ''}`}>
-                  <CardContent className={`p-6 flex flex-col items-center text-center ${cat.color} rounded-lg h-full`}>
-                    <div className="mb-4 p-4 bg-white rounded-full">
-                      {cat.icon}
-                    </div>
-                    <h3 className="font-bold text-lg mb-2">{cat.name}</h3>
-                    <p className="text-sm text-gray-600 mb-4">{cat.description}</p>
-                    <Button variant="outline" size="sm" className="mt-auto">
-                      View {cat.name} <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-          
-          {/* Selected Category Content */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="mb-8">
+            <Link to="/faq" className="text-gray-500 hover:text-gray-800 flex items-center mb-4">
+              ← Back to Help Center
+            </Link>
+            
             <div className="flex items-center mb-6">
-              <div className={`p-3 rounded-full ${activeCategory.color} mr-4`}>
+              <div className={`p-4 rounded-full ${activeCategory.color} mr-5`}>
                 {activeCategory.icon}
               </div>
-              <h2 className="text-2xl font-bold">{activeCategory.name}</h2>
+              <div>
+                <h1 className="text-3xl font-bold">{activeCategory.name}</h1>
+                <p className="text-gray-600">{activeCategory.description}</p>
+              </div>
             </div>
-            
-            <ScrollArea className="h-[400px] rounded-md border p-4">
-              <div className="space-y-6">
+          </div>
+          
+          {/* Questions and Answers for the Category */}
+          <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <ScrollArea className="h-auto max-h-[600px]">
+              <div className="space-y-8">
                 {activeCategory.questions.map((item, index) => (
-                  <div key={index} className="bg-gray-50 p-6 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div key={index} className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="text-xl font-medium mb-3">{item.question}</h3>
                     <p className="text-gray-700">{item.answer}</p>
                   </div>
@@ -165,14 +217,14 @@ const Faq: React.FC = () => {
           
           {/* Other Categories */}
           <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="font-medium mb-4 text-lg">Other FAQ Topics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <h3 className="font-medium mb-5 text-xl">Other Help Topics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {faqCategories
-                .filter(cat => cat.id !== activeCategoryId)
+                .filter(cat => cat.id !== category)
                 .map(cat => (
                   <Link to={`/faq/${cat.id}`} key={cat.id} className="block">
-                    <div className={`${cat.color} p-4 rounded-lg flex items-center hover:shadow-sm transition-all`}>
-                      <div className="mr-3">
+                    <div className={`${cat.color} p-4 rounded-lg flex items-center hover:shadow-md transition-all`}>
+                      <div className="mr-3 bg-white p-2 rounded-full">
                         {cat.icon}
                       </div>
                       <span className="font-medium">{cat.name}</span>
