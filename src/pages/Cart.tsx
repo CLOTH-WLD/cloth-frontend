@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +6,7 @@ import { useCart } from '@/context/CartContext';
 import CartItem from '@/components/CartItem';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ArrowLeft, Loader2, Pencil } from 'lucide-react';
+import { ArrowLeft, Loader2, Pencil, CheckCircle2, X } from 'lucide-react';
 import { formatCurrency, initiatePayment } from '@/services/paymentService';
 import { ShippingDetails } from '@/components/profile/ShippingTab';
 import { 
@@ -23,6 +24,12 @@ import Select from 'react-select';
 import { countryOptions } from '@/components/profile/ShippingTab';
 import { Button } from '@/components/ui/button';
 
+const VALID_VOUCHERS = [
+  { code: 'WELCOME20', discount: 0.2, discountText: '20%' },
+  { code: 'SUMMER10', discount: 0.1, discountText: '10%' },
+  { code: 'FREESHIP', discount: 5, discountText: '$5 Off' }
+];
+
 const Cart: React.FC = () => {
   const { items, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
@@ -39,6 +46,8 @@ const Cart: React.FC = () => {
   const [editingShipping, setEditingShipping] = useState(true);
   const [shippingValid, setShippingValid] = useState(false);
   const { toast } = useToast();
+  const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState<typeof VALID_VOUCHERS[0] | null>(null);
   
   // Load shipping details from profile (localStorage in this example)
   useEffect(() => {
@@ -104,7 +113,7 @@ const Cart: React.FC = () => {
     
     try {
       setLoading(true);
-      const paymentIntent = await initiatePayment(items, subtotal);
+      const paymentIntent = await initiatePayment(items, getDiscountedTotal());
       
       // Save shipping details to localStorage
       localStorage.setItem('shipping-details', JSON.stringify(shippingDetails));
@@ -119,6 +128,46 @@ const Cart: React.FC = () => {
       console.error('Checkout failed:', error);
       setLoading(false);
     }
+  };
+
+  const applyVoucher = () => {
+    if (!voucherCode.trim()) return;
+    
+    const voucher = VALID_VOUCHERS.find(v => v.code === voucherCode.trim().toUpperCase());
+    
+    if (voucher) {
+      setAppliedVoucher(voucher);
+      toast({
+        title: "Voucher Applied",
+        description: `${voucher.discountText} discount has been applied to your order.`,
+        variant: "default"
+      });
+    } else {
+      toast({
+        title: "Invalid Voucher",
+        description: "The voucher code you entered is not valid.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const removeVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherCode('');
+  };
+
+  const getDiscountAmount = () => {
+    if (!appliedVoucher) return 0;
+    
+    if (appliedVoucher.code === 'FREESHIP') {
+      return appliedVoucher.discount;
+    }
+    
+    return subtotal * appliedVoucher.discount;
+  };
+
+  const getDiscountedTotal = () => {
+    return Math.max(0, subtotal - getDiscountAmount());
   };
 
   const selectedCountry = countryOptions.find(option => option.label === shippingDetails.country) || null;
@@ -307,7 +356,7 @@ const Cart: React.FC = () => {
                             required 
                           />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 sm:col-span-2">
                           <Label htmlFor="country">Country</Label>
                           <Select
                             id="country"
@@ -318,6 +367,8 @@ const Cart: React.FC = () => {
                             className="react-select-container"
                             classNamePrefix="react-select"
                             styles={customSelectStyles}
+                            menuPosition="fixed"
+                            menuPlacement="auto"
                           />
                         </div>
                       </div>
@@ -359,18 +410,62 @@ const Cart: React.FC = () => {
                 </div>
               )}
               
+              {/* Voucher Input */}
+              <div className="w-full border rounded-md p-4">
+                <h3 className="font-medium mb-2">Have a voucher?</h3>
+                {appliedVoucher ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 mr-2" />
+                      <span className="text-sm">
+                        {appliedVoucher.code} - {appliedVoucher.discountText} applied
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeVoucher}
+                      className="h-8 px-2 text-destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter voucher code"
+                      value={voucherCode}
+                      onChange={(e) => setVoucherCode(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={applyVoucher}
+                      variant="outline"
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
               <div className="pt-4 border-t">
                 <div className="flex justify-between mb-2">
                   <p className="text-sm text-cloth-mediumgray">Subtotal</p>
                   <p className="text-sm font-medium">{formatCurrency(subtotal)}</p>
                 </div>
-                <div className="flex justify-between mb-4">
+                <div className="flex justify-between mb-2">
                   <p className="text-sm text-cloth-mediumgray">Shipping</p>
                   <p className="text-sm font-medium">Calculated at checkout</p>
                 </div>
+                {appliedVoucher && (
+                  <div className="flex justify-between mb-2">
+                    <p className="text-sm text-cloth-mediumgray">Discount ({appliedVoucher.discountText})</p>
+                    <p className="text-sm font-medium text-green-600">-{formatCurrency(getDiscountAmount())}</p>
+                  </div>
+                )}
                 <div className="flex justify-between mb-6">
                   <p className="font-medium">Total</p>
-                  <p className="font-semibold">{formatCurrency(subtotal)}</p>
+                  <p className="font-semibold">{formatCurrency(getDiscountedTotal())}</p>
                 </div>
                 
                 <button
