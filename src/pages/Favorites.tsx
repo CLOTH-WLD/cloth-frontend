@@ -81,7 +81,7 @@ const Favorites: React.FC = () => {
         ) : (
           <AnimatePresence>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {favoriteProducts.map((product) => (
+              {favoriteProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -90,8 +90,8 @@ const Favorites: React.FC = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <ProductCard 
-                    product={product} 
-                    onToggleFavorite={() => handleToggleFavorite(product.id)}
+                    product={product}
+                    index={index}
                   />
                 </motion.div>
               ))}

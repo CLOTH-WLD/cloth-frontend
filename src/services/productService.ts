@@ -142,6 +142,16 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
   });
 };
 
+export const getFavoriteProducts = async (): Promise<Product[]> => {
+  // In a real implementation, this would fetch favorite products from your API
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const favorites = mockProducts.filter(p => p.isFavorite === true);
+      resolve(favorites);
+    }, 300);
+  });
+};
+
 export const toggleFavorite = async (productId: string): Promise<boolean> => {
   // This would be a real API call in production
   return new Promise((resolve) => {
