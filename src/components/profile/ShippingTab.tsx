@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { Edit } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Edit, Pencil } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import Select from 'react-select';
 
 export interface ShippingDetails {
   fullName: string;
@@ -24,6 +27,24 @@ interface ShippingTabProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+// Country options for the dropdown
+const countryOptions = [
+  { value: 'US', label: 'United States' },
+  { value: 'CA', label: 'Canada' },
+  { value: 'UK', label: 'United Kingdom' },
+  { value: 'AU', label: 'Australia' },
+  { value: 'FR', label: 'France' },
+  { value: 'DE', label: 'Germany' },
+  { value: 'IT', label: 'Italy' },
+  { value: 'ES', label: 'Spain' },
+  { value: 'JP', label: 'Japan' },
+  { value: 'CN', label: 'China' },
+  { value: 'IN', label: 'India' },
+  { value: 'BR', label: 'Brazil' },
+  { value: 'MX', label: 'Mexico' },
+  // Add more countries as needed
+];
+
 const ShippingTab: React.FC<ShippingTabProps> = ({
   shippingDetails,
   editingShipping,
@@ -31,19 +52,35 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
   handleShippingUpdate,
   handleInputChange
 }) => {
+  const handleCountryChange = (selectedOption: any) => {
+    const event = {
+      target: {
+        name: 'country',
+        value: selectedOption.label
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    handleInputChange(event);
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const event = {
+      target: {
+        name: 'phone',
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    handleInputChange(event);
+  };
+
+  const selectedCountry = countryOptions.find(option => option.label === shippingDetails.country) || null;
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <CardTitle>Shipping Details</CardTitle>
           <CardDescription>Your shipping information for orders</CardDescription>
         </div>
-        {!editingShipping && (
-          <Button variant="ghost" size="sm" onClick={() => setEditingShipping(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-        )}
       </CardHeader>
       <CardContent>
         {editingShipping ? (
@@ -61,12 +98,13 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input 
-                  id="phone" 
-                  name="phone" 
-                  value={shippingDetails.phone} 
-                  onChange={handleInputChange} 
-                  required 
+                <PhoneInput
+                  country={'us'}
+                  value={shippingDetails.phone}
+                  onChange={handlePhoneChange}
+                  inputClass="!w-full !h-10 !py-2 !px-3 !text-base md:!text-sm !rounded-md !border !border-input"
+                  buttonClass="!border !border-input !rounded-md"
+                  containerClass="!w-full"
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
@@ -111,12 +149,14 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="country">Country</Label>
-                <Input 
-                  id="country" 
-                  name="country" 
-                  value={shippingDetails.country} 
-                  onChange={handleInputChange} 
-                  required 
+                <Select
+                  id="country"
+                  options={countryOptions}
+                  value={selectedCountry}
+                  onChange={handleCountryChange}
+                  placeholder="Select country"
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                 />
               </div>
             </div>
@@ -162,6 +202,14 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
           </div>
         )}
       </CardContent>
+      <CardFooter className="flex justify-end">
+        {!editingShipping && (
+          <Button variant="outline" size="sm" onClick={() => setEditingShipping(true)}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Shipping Details
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   );
 };

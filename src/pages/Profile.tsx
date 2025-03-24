@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
@@ -40,7 +39,6 @@ const mockVouchers: Voucher[] = [
 ];
 
 const Profile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('orders');
   const [editingShipping, setEditingShipping] = useState(false);
   const [shippingDetails, setShippingDetails] = useState(mockShipping);
   const [editingEmail, setEditingEmail] = useState(false);
@@ -105,17 +103,10 @@ const Profile: React.FC = () => {
                 handleInputChange={handleInputChange}
               />
               
-              {/* Orders and Vouchers Tabs */}
+              {/* Orders and Vouchers */}
               <ProfileTabs 
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
-                shippingDetails={shippingDetails}
                 orders={mockOrders}
                 vouchers={mockVouchers}
-                editingShipping={editingShipping}
-                setEditingShipping={setEditingShipping}
-                handleShippingUpdate={handleShippingUpdate}
-                handleInputChange={handleInputChange}
                 isMobile={isMobile}
               />
             </div>

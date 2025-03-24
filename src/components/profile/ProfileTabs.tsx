@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { MapPin, Package, Ticket } from 'lucide-react';
 import OrdersTab, { Order } from './OrdersTab';
 import VouchersTab, { Voucher } from './VouchersTab';
 

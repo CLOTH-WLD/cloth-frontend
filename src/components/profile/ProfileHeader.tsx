@@ -56,34 +56,36 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <ExternalLink className="h-4 w-4" />
             </Button>
           </div>
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5 text-gray-500 shrink-0" />
-            <div className="flex-1 min-w-0">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5 text-gray-500 shrink-0" />
               <p className="text-sm font-medium">Email</p>
-              {editingEmail ? (
-                <form onSubmit={handleEmailUpdate} className="mt-1 flex items-center gap-2">
-                  <Input 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="h-8 text-sm"
-                    required
-                  />
-                  <div className="flex gap-1">
-                    <Button type="submit" size="sm" className="h-8 px-2">Save</Button>
-                    <Button type="button" variant="outline" size="sm" className="h-8 px-2" onClick={() => setEditingEmail(false)}>Cancel</Button>
-                  </div>
-                </form>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-500">{email || 'Not set'}</p>
-                  <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)} className="h-7 px-2">
-                    <Edit className="h-3.5 w-3.5 mr-1" />
-                    {email ? 'Edit' : 'Add'}
-                  </Button>
-                </div>
+              {!editingEmail && (
+                <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)} className="ml-auto h-7 px-2">
+                  <Edit className="h-3.5 w-3.5 mr-1" />
+                  {email ? 'Edit' : 'Add'}
+                </Button>
               )}
             </div>
+            
+            {editingEmail ? (
+              <form onSubmit={handleEmailUpdate} className="space-y-2">
+                <Input 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full text-sm"
+                  required
+                  type="email"
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setEditingEmail(false)}>Cancel</Button>
+                  <Button type="submit" size="sm">Save</Button>
+                </div>
+              </form>
+            ) : (
+              <p className="text-sm text-gray-500">{email || 'Not set'}</p>
+            )}
           </div>
         </div>
       </CardContent>
