@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Input } from './ui/input';
-import { X, Search, ExternalLink } from 'lucide-react';
+import { X, Search, ExternalLink, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAllProducts } from '@/services/productService';
@@ -92,86 +92,95 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
   };
 
   return (
-    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
-      <SheetTrigger asChild>
-        <div className="relative w-full">
-          <Input 
-            ref={triggerRef}
-            placeholder="Search" 
-            readOnly
-            className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
-            onClick={() => setOpen(true)}
-          />
+    <div className="w-full">
+      <div className="relative w-full">
+        <Input 
+          ref={triggerRef}
+          placeholder="Search" 
+          readOnly
+          className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
+          onClick={() => setOpen(true)}
+        />
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+          <Search className="w-5 h-5 text-gray-500" />
         </div>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-[60vh] max-h-[60vh] p-0 rounded-t-[20px]">
-        <div className="h-full flex flex-col overflow-hidden bg-white">
-          {/* Search header */}
-          <div className="p-4 flex items-center gap-3 border-b sticky top-0 bg-white z-10">
-            <SheetClose asChild>
+      </div>
+
+      {/* Search component that slides in below the navbar */}
+      {open && (
+        <div className="fixed inset-x-0 top-[105px] z-50 bg-white shadow-md">
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="flex items-center gap-3 p-4 border-b">
               <button onClick={handleClose} aria-label="Close search" className="p-1">
-                <X className="h-5 w-5" />
+                <ArrowLeft className="h-5 w-5" />
               </button>
-            </SheetClose>
-            <Input 
-              ref={searchInputRef}
-              placeholder="Search products..."
-              className="flex-1 h-10 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search products"
-              autoFocus
-            />
+              <Input 
+                ref={searchInputRef}
+                placeholder="Search products..."
+                className="flex-1 h-10 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Search products"
+                autoFocus
+              />
+            </div>
+            
+            {/* Search results area with a fixed height */}
+            <div className="overflow-y-auto p-4 max-h-[60vh]">
+              {isLoading ? (
+                <div className="text-center py-6">Searching...</div>
+              ) : (
+                <>
+                  {searchTerm.length < 2 ? (
+                    <div className="text-center py-6 text-gray-500">
+                      Type at least 2 characters to search
+                    </div>
+                  ) : searchResults.length === 0 ? (
+                    <div className="text-center py-6">
+                      No products found for "{searchTerm}"
+                    </div>
+                  ) : (
+                    <AnimatePresence>
+                      <div className="space-y-4">
+                        {searchResults.map((product, index) => (
+                          <motion.div
+                            key={product.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.2, delay: index * 0.05 }}
+                          >
+                            <Link 
+                              to={`/product/${product.id}`}
+                              className="flex items-center justify-between py-3 w-full group"
+                              onClick={handleClose}
+                            >
+                              <div className="flex items-center gap-3">
+                                <Search className="h-5 w-5 text-gray-500 shrink-0" />
+                                <span className="font-medium text-black">{product.title}</span>
+                              </div>
+                              <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
+                            </Link>
+                            {index < searchResults.length - 1 && <hr className="border-gray-100" />}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </AnimatePresence>
+                  )}
+                </>
+              )}
+            </div>
           </div>
           
-          {/* Search results */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {isLoading ? (
-              <div className="text-center py-6">Searching...</div>
-            ) : (
-              <>
-                {searchTerm.length < 2 ? (
-                  <div className="text-center py-6 text-gray-500">
-                    Type at least 2 characters to search
-                  </div>
-                ) : searchResults.length === 0 ? (
-                  <div className="text-center py-6">
-                    No products found for "{searchTerm}"
-                  </div>
-                ) : (
-                  <AnimatePresence>
-                    <div className="space-y-4">
-                      {searchResults.map((product, index) => (
-                        <motion.div
-                          key={product.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.2, delay: index * 0.05 }}
-                        >
-                          <Link 
-                            to={`/product/${product.id}`}
-                            className="flex items-center justify-between py-3 w-full group"
-                            onClick={handleClose}
-                          >
-                            <div className="flex items-center gap-3">
-                              <Search className="h-5 w-5 text-gray-500 shrink-0" />
-                              <span className="font-medium text-black">{product.title}</span>
-                            </div>
-                            <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-black transition-colors shrink-0" />
-                          </Link>
-                          {index < searchResults.length - 1 && <hr className="border-gray-100" />}
-                        </motion.div>
-                      ))}
-                    </div>
-                  </AnimatePresence>
-                )}
-              </>
-            )}
-          </div>
+          {/* Overlay to allow clicking outside to close */}
+          <div 
+            className="fixed inset-0 bg-black/20 -z-10" 
+            onClick={handleClose}
+            aria-hidden="true"
+          />
         </div>
-      </SheetContent>
-    </Sheet>
+      )}
+    </div>
   );
 };
 

@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   
   return (
-    <header className="bg-white border-b">
+    <header className="bg-white border-b sticky top-0 z-40">
       {/* Top row with logo and icons */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
         <Link to="/" className="flex items-center space-x-2">
@@ -48,9 +48,6 @@ const Navbar: React.FC = () => {
           
           <div className="flex-1 relative">
             <SearchDrawer triggerRef={searchInputRef} />
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <Search className="w-6 h-6" />
-            </div>
           </div>
         </div>
       </div>

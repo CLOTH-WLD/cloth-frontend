@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
@@ -7,8 +6,10 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ShippingTab, { ShippingDetails } from '@/components/profile/ShippingTab';
 import ProfileTabs from '@/components/profile/ProfileTabs';
+import PreferencesTab from '@/components/profile/PreferencesTab';
 import { Order } from '@/components/profile/OrdersTab';
 import { Voucher } from '@/components/profile/VouchersTab';
+import { Separator } from '@/components/ui/separator';
 
 const mockProfile = {
   username: 'alex_miller',
@@ -48,7 +49,6 @@ const Profile: React.FC = () => {
   const isMobile = useIsMobile();
   
   useEffect(() => {
-    // Load user preference from localStorage
     const storedPreference = localStorage.getItem('userPreference');
     if (storedPreference) {
       setUserPreference(storedPreference);
@@ -58,7 +58,6 @@ const Profile: React.FC = () => {
   const handleShippingUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     setEditingShipping(false);
-    // In a real app, you would send this data to your API
     console.log('Shipping details updated:', shippingDetails);
   };
   
@@ -73,7 +72,6 @@ const Profile: React.FC = () => {
   const handleEmailUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     setEditingEmail(false);
-    // In a real app, you would send this data to your API
     console.log('Email updated:', email);
   };
   
@@ -91,7 +89,6 @@ const Profile: React.FC = () => {
           transition={{ duration: 0.4 }}
         >
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* User summary card */}
             <ProfileHeader 
               username={mockProfile.username}
               walletAddress={mockProfile.walletAddress}
@@ -102,9 +99,7 @@ const Profile: React.FC = () => {
               handleEmailUpdate={handleEmailUpdate}
             />
             
-            {/* Main content area */}
             <div className="flex-1 flex flex-col gap-6">
-              {/* Now using the updated ProfileTabs component with tabs */}
               <ProfileTabs 
                 orders={mockOrders}
                 vouchers={mockVouchers}
@@ -119,6 +114,15 @@ const Profile: React.FC = () => {
                 userPreference={userPreference}
                 setUserPreference={setUserPreference}
               />
+              
+              <div className="mt-8">
+                <Separator className="mb-6" />
+                <h2 className="text-lg font-semibold mb-4">Shopping Preferences</h2>
+                <PreferencesTab 
+                  userPreference={userPreference} 
+                  setUserPreference={setUserPreference} 
+                />
+              </div>
             </div>
           </div>
         </motion.div>
