@@ -3,7 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
@@ -14,6 +15,17 @@ import Favorites from "./pages/Favorites";
 import Faq from "./pages/Faq";
 import { CartProvider } from "./context/CartContext";
 
+// ScrollToTop component to handle scrolling to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,6 +35,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <div>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -32,10 +45,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/faq" element={<Faq />} />
-              <Route path="/faq/shipping" element={<Faq />} />
-              <Route path="/faq/returns" element={<Faq />} />
-              <Route path="/faq/sizing" element={<Faq />} />
-              <Route path="/faq/orders" element={<Faq />} />
+              <Route path="/faq/:category" element={<Faq />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
