@@ -10,9 +10,7 @@ import {
 
 const FAQAccordion = () => {
   return (
-    <div className="max-w-7xl mx-auto py-4 px-4">
-      <h2 className="text-2xl font-semibold mb-6 text-center">Customer Support</h2>
-      
+    <div className="max-w-7xl mx-auto py-4 px-4">      
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="help">
           <AccordionTrigger className="flex items-center">
