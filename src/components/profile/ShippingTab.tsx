@@ -391,7 +391,7 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                     borderBottomRightRadius: 0 
                   }}
                   inputStyle={{ 
-                    paddingLeft: '78px', 
+                    paddingLeft: '90px', // Increased padding to ensure number is not hiding under the flag
                     width: '100%', 
                     background: 'hsl(var(--background))', 
                     borderTopLeftRadius: 0, 
@@ -411,6 +411,9 @@ const ShippingTab: React.FC<ShippingTabProps> = ({
                     borderColor: 'hsl(var(--input))'
                   }}
                   enableSearch={true}
+                  containerStyle={{
+                    width: '100%'
+                  }}
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
