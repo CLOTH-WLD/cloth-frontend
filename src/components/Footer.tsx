@@ -14,8 +14,7 @@ const Footer: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto">
         {/* FAQ Accordion at the top of the footer */}
-        <div className="mb-8 border-b border-cloth-lightgray pb-8">
-          <h3 className="font-semibold text-lg mb-4">Frequently Asked Questions</h3>
+        <div className="mb-8">
           <FAQAccordion />
         </div>
         

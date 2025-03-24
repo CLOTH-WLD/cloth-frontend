@@ -51,6 +51,11 @@ const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
             onClick={handleNavigateToProduct}
           >
             {product.title}
+            {hasSize && (
+              <span className="ml-1 text-xs font-normal text-cloth-mediumgray">
+                ({product.sizes[0]})
+              </span>
+            )}
           </h3>
           <p className="ml-4 text-sm font-medium">
             {formatCurrency(product.price * quantity)}
