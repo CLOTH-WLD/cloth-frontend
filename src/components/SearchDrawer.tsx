@@ -29,12 +29,14 @@ const SearchDrawer: React.FC<SearchDrawerProps> = ({ triggerRef }) => {
     fetchProducts();
   }, []);
 
-  // Add delay when focusing the search input
+  // Focus the search input after the drawer is opened with a delay to avoid keyboard issues
   useEffect(() => {
     let focusTimeout: NodeJS.Timeout;
     
     if (open && searchInputRef.current) {
+      // First delay to allow the sheet to animate open
       focusTimeout = setTimeout(() => {
+        // Then focus the input
         searchInputRef.current?.focus();
       }, 300); // 300ms delay
     }
