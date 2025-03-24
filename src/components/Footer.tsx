@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -19,9 +18,7 @@ const Footer: React.FC = () => {
             Minimalist clothing for the modern lifestyle.
           </p>
           <div className="flex items-center text-sm text-cloth-mediumgray">
-            <span>Powered with</span>
-            <Heart className="h-3 w-3 mx-1 text-cloth-charcoal" />
-            <span>WorldCoin</span>
+            <span>Powered with WorldCoin</span>
           </div>
         </div>
         
@@ -46,6 +43,11 @@ const Footer: React.FC = () => {
             <li>
               <Link to="/profile" className="text-cloth-mediumgray hover:text-cloth-charcoal transition-colors">
                 Profile
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" className="text-cloth-mediumgray hover:text-cloth-charcoal transition-colors">
+                FAQ
               </Link>
             </li>
           </ul>
