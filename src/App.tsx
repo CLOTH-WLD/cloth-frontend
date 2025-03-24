@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import Favorites from "./pages/Favorites";
 import Faq from "./pages/Faq";
+import OrderDetail from "./pages/OrderDetail";
 import { CartProvider } from "./context/CartContext";
 
 // ScrollToTop component to handle scrolling to top on route change

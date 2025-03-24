@@ -27,7 +27,7 @@ interface ShippingTabProps {
 }
 
 // Complete list of countries for the dropdown
-const countryOptions = [
+export const countryOptions = [
   { value: 'AF', label: 'Afghanistan' },
   { value: 'AL', label: 'Albania' },
   { value: 'DZ', label: 'Algeria' },
