@@ -11,7 +11,6 @@ import CategoryCarousel from '@/components/CategoryCarousel';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
 import CategoryGrid from '@/components/CategoryGrid';
 import NotificationBanner from '@/components/NotificationBanner';
-import FAQAccordion from '@/components/FAQAccordion';
 
 const Index: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -101,11 +100,6 @@ const Index: React.FC = () => {
         {/* Notification Banner */}
         <NotificationBanner />
       </main>
-      
-      {/* FAQ Accordion Section - Directly before footer with reduced spacing */}
-      <div className="bg-cloth-lightbeige py-0">
-        <FAQAccordion />
-      </div>
       
       <Footer />
       

@@ -10,7 +10,7 @@ import {
 
 const FAQAccordion = () => {
   return (
-    <div className="max-w-7xl mx-auto py-4 px-4">      
+    <div className="max-w-7xl mx-auto">      
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="help">
           <AccordionTrigger className="flex items-center">
@@ -66,22 +66,22 @@ const FAQAccordion = () => {
               </li>
               <li>
                 <a 
-                  href="https://twitter.com/clothapparel" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-cloth-charcoal/80 hover:text-cloth-charcoal flex items-center gap-1"
-                >
-                  Twitter <ExternalLink size={14} />
-                </a>
-              </li>
-              <li>
-                <a 
                   href="https://discord.gg/clothcommunity" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-cloth-charcoal/80 hover:text-cloth-charcoal flex items-center gap-1"
                 >
                   Discord <ExternalLink size={14} />
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://twitter.com/clothapparel" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-cloth-charcoal/80 hover:text-cloth-charcoal flex items-center gap-1"
+                >
+                  Twitter <ExternalLink size={14} />
                 </a>
               </li>
             </ul>
@@ -98,9 +98,13 @@ const FAQAccordion = () => {
           <AccordionContent>
             <div className="pl-7 pr-4">
               <p className="text-cloth-charcoal/80">
-                Cloth is a minimalist clothing brand founded in 2023 with a mission to provide high-quality, 
-                sustainable essentials for the modern wardrobe. We believe in timeless design, ethical 
-                manufacturing, and creating pieces that last beyond seasonal trends.
+              Cloth is a curated online clothing store founded in 2025, 
+              built on the idea of making quality essentials accessible through a clean, 
+              modern shopping experience. We partner with global suppliers to offer 
+              timeless, everyday pieces without traditional retail markups. 
+              While we don&apos;t manufacture our own items, we focus on selecting 
+              products that align with our values: simplicity, comfort, and 
+              style that lasts.
               </p>
             </div>
           </AccordionContent>
