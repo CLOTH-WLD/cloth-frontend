@@ -44,19 +44,21 @@ const Navbar: React.FC = () => {
             <BurgerMenu />
             
             <div className="flex-1 relative">
-              <button 
-                onClick={() => setIsSearchActive(true)}
-                className="block w-full"
-              >
-                <Input 
-                  placeholder="Search" 
-                  readOnly
-                  className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
-                />
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <Search className="w-5 h-5 text-gray-500" />
-                </div>
-              </button>
+              {!isSearchActive ? (
+                <button 
+                  onClick={() => setIsSearchActive(true)}
+                  className="block w-full"
+                >
+                  <Input 
+                    placeholder="Search" 
+                    readOnly
+                    className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
+                  />
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <Search className="w-5 h-5 text-gray-500" />
+                  </div>
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
