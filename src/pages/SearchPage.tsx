@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAllProducts } from '@/services/productService';
 import { Product } from '@/types/product';
 import ProductCard from '@/components/ProductCard';
 import { Link } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
 
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,17 +44,6 @@ const SearchPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="relative w-full max-w-2xl mx-auto mb-8">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input 
-            placeholder="Search products, brands, and categories..."
-            className="pl-10 h-12 border-none bg-cloth-offwhite focus-visible:ring-0 focus-visible:ring-offset-0 rounded-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            autoFocus
-          />
-        </div>
-
         <div className="space-y-8">
           {isLoading ? (
             <div className="py-20 flex justify-center">
