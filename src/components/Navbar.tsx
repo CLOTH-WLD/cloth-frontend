@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, Heart, Search, ArrowLeft } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
@@ -10,21 +10,23 @@ import BurgerMenu from './BurgerMenu';
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const location = useLocation();
-  const isSearchPage = location.pathname === '/search';
-  const previousPath = location.state?.from || '/';
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   return (
     <header className="bg-white border-b sticky top-0 z-40">
       {/* Top row with logo and icons */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
-        {isSearchPage ? (
+        {isSearchActive ? (
           <div className="flex-1 flex items-center space-x-4">
-            <Link to={previousPath} className="p-2">
+            <button onClick={() => setIsSearchActive(false)} className="p-2">
               <ArrowLeft className="w-5 h-5" />
-            </Link>
+            </button>
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search products, brands, and categories..."
                 className="pl-10 h-10 w-full border-none bg-cloth-offwhite focus-visible:ring-0 focus-visible:ring-offset-0"
                 autoFocus
@@ -60,15 +62,14 @@ const Navbar: React.FC = () => {
       </div>
       
       {/* Bottom row with burger menu and search */}
-      {!isSearchPage && (
+      {!isSearchActive && (
         <div className="border-t border-gray-200">
           <div className="max-w-7xl mx-auto flex items-center w-full">
             <BurgerMenu />
             
             <div className="flex-1 relative">
-              <Link 
-                to="/search" 
-                state={{ from: location.pathname }}
+              <button 
+                onClick={() => setIsSearchActive(true)}
                 className="block w-full"
               >
                 <Input 
@@ -79,7 +80,7 @@ const Navbar: React.FC = () => {
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
                   <Search className="w-5 h-5 text-gray-500" />
                 </div>
-              </Link>
+              </button>
             </div>
           </div>
         </div>

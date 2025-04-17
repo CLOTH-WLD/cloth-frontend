@@ -17,7 +17,6 @@ import WomenLanding from "./pages/WomenLanding";
 import MenLanding from "./pages/MenLanding";
 import KidsLanding from "./pages/KidsLanding";
 import CategoryPage from "./pages/CategoryPage";
-import SearchPage from './pages/SearchPage';
 import { CartProvider } from "./context/CartContext";
 
 const ScrollToTop = () => {
@@ -55,7 +54,6 @@ const App = () => (
               <Route path="/faq" element={<Faq />} />
               <Route path="/faq/:category" element={<Faq />} />
               <Route path="/order/:orderId" element={<OrderDetail />} />
-              <Route path="/search" element={<SearchPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
