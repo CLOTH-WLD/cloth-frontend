@@ -7,11 +7,11 @@ import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import BurgerMenu from './BurgerMenu';
-import SearchDrawer from './SearchDrawer';
+import SearchModal from './SearchModal';
 
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   return (
     <header className="bg-white border-b sticky top-0 z-40">
@@ -47,7 +47,23 @@ const Navbar: React.FC = () => {
           <BurgerMenu />
           
           <div className="flex-1 relative">
-            <SearchDrawer triggerRef={searchInputRef} />
+            <div className="relative w-full">
+              <Input 
+                placeholder="Search" 
+                readOnly
+                className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
+                onClick={() => setIsSearchOpen(true)}
+              />
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <Search className="w-5 h-5 text-gray-500" />
+              </div>
+            </div>
+            
+            {/* Search Modal */}
+            <SearchModal 
+              isOpen={isSearchOpen} 
+              onClose={() => setIsSearchOpen(false)} 
+            />
           </div>
         </div>
       </div>
