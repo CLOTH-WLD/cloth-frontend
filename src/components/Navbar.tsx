@@ -12,42 +12,33 @@ const Navbar: React.FC = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
   
   return (
-    <header className="bg-white border-b sticky top-0 z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
-        {isSearchActive ? (
-          <SearchOverlay 
-            isActive={isSearchActive} 
-            onClose={() => setIsSearchActive(false)} 
-          />
-        ) : (
-          <>
-            <Link to="/" className="flex items-center space-x-2">
-              <span className="text-xl font-semibold tracking-tighter">Cloth</span>
+    <>
+      <header className="bg-white border-b sticky top-0 z-50 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-xl font-semibold tracking-tighter">Cloth</span>
+          </Link>
+          
+          <div className="flex items-center space-x-5">
+            <Link to="/profile" className="p-1">
+              <User className="w-6 h-6" />
             </Link>
             
-            <div className="flex items-center space-x-5">
-              <Link to="/profile" className="p-1">
-                <User className="w-6 h-6" />
-              </Link>
-              
-              <Link to="/favorites" className="p-1">
-                <Heart className="w-6 h-6" />
-              </Link>
-              
-              <Link to="/cart" className="relative p-1">
-                <ShoppingBag className="w-6 h-6" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-cloth-charcoal text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {itemCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
-      
-      {!isSearchActive && (
+            <Link to="/favorites" className="p-1">
+              <Heart className="w-6 h-6" />
+            </Link>
+            
+            <Link to="/cart" className="relative p-1">
+              <ShoppingBag className="w-6 h-6" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-cloth-charcoal text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        </div>
+        
         <div className="border-t border-gray-200">
           <div className="max-w-7xl mx-auto flex items-center w-full">
             <BurgerMenu />
@@ -69,10 +60,16 @@ const Navbar: React.FC = () => {
             </div>
           </div>
         </div>
+      </header>
+      
+      {isSearchActive && (
+        <SearchOverlay 
+          isActive={isSearchActive} 
+          onClose={() => setIsSearchActive(false)} 
+        />
       )}
-    </header>
+    </>
   );
 };
 
 export default Navbar;
-
