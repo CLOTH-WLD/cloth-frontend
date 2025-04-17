@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { Skeleton } from '../ui/skeleton';
 import { Product } from '@/types/product';
@@ -60,15 +59,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
 
   return (
     <div className="fixed inset-x-0 bottom-0 bg-white z-40" style={{ top: '109px' }}>
-      <div className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center space-x-4">
-          <button onClick={onClose} className="p-2">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-      
-      <div className="h-[calc(100vh-165px)] overflow-y-auto">
+      <div className="h-[calc(100vh-125px)] overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 py-4">
           {searchTerm.trim() === '' ? (
             <div className="py-8 text-center text-gray-500">
