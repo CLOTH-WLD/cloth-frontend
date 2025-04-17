@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingBag, User, Heart, Search, ArrowLeft, X } from 'lucide-react';
@@ -66,7 +67,7 @@ const Navbar: React.FC = () => {
   
   return (
     <>
-      <header className={`bg-white border-b sticky top-0 z-50 shadow-sm`}>
+      <header className="bg-white border-b sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
           {isSearchActive ? (
             <div className="flex-1 flex items-center space-x-4">
