@@ -66,7 +66,7 @@ const Navbar: React.FC = () => {
   
   return (
     <>
-      <header className={`bg-white border-b sticky top-0 z-40 ${isSearchActive ? 'relative z-50' : ''}`}>
+      <header className={`bg-white border-b sticky top-0 z-50 shadow-sm`}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
           {isSearchActive ? (
             <div className="flex-1 flex items-center space-x-4">
@@ -146,7 +146,7 @@ const Navbar: React.FC = () => {
       </header>
 
       {isSearchActive && (
-        <div className="fixed inset-0 bg-white z-40 top-[57px]">
+        <div className="fixed inset-0 bg-white z-40" style={{ top: '57px' }}>
           <div className="h-full overflow-y-auto">
             <div className="max-w-7xl mx-auto px-4 py-4">
               {searchTerm.trim() === '' ? (
