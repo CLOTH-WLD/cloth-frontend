@@ -1,16 +1,14 @@
-import React, { useState, useRef } from 'react';
+
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, User, Heart, Search } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import BurgerMenu from './BurgerMenu';
-import SearchModal from './SearchModal';
 
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   return (
     <header className="bg-white border-b sticky top-0 z-40">
