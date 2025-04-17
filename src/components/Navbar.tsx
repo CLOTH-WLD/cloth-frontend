@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, User, Heart, Search } from 'lucide-react';
+import { ShoppingBag, User, Heart, Search, ArrowLeft } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { Input } from './ui/input';
 import BurgerMenu from './BurgerMenu';
@@ -42,7 +42,19 @@ const Navbar: React.FC = () => {
         
         <div className="border-t border-gray-200">
           <div className="max-w-7xl mx-auto flex items-center w-full">
-            <BurgerMenu />
+            {!isSearchActive ? (
+              <BurgerMenu />
+            ) : (
+              <button 
+                onClick={() => {
+                  setIsSearchActive(false);
+                  setSearchTerm('');
+                }} 
+                className="p-3"
+              >
+                <ArrowLeft className="w-6 h-6" />
+              </button>
+            )}
             
             <div className="flex-1 relative">
               <Input 
