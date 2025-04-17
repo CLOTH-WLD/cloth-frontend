@@ -1,17 +1,72 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, User, Heart, Search, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, User, Heart, Search, ArrowLeft, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import BurgerMenu from './BurgerMenu';
+import { Separator } from './ui/separator';
+import { Skeleton } from './ui/skeleton';
+import { Product } from '@/types/product';
+import { getAllProducts } from '@/services/productService';
 
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const location = useLocation();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Fetch products for search
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const allProducts = await getAllProducts();
+        setProducts(allProducts);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    };
+    
+    if (isSearchActive) {
+      fetchProducts();
+    }
+  }, [isSearchActive]);
+  
+  // Filter products based on search term
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredProducts([]);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    // Simple debounce
+    const timer = setTimeout(() => {
+      const filtered = products.filter(product => 
+        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+      setIsLoading(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm, products]);
+  
+  const handleClearSearch = () => {
+    setSearchTerm('');
+  };
+  
+  const handleCloseSearch = () => {
+    setIsSearchActive(false);
+    setSearchTerm('');
+    setFilteredProducts([]);
+  };
   
   return (
     <header className="bg-white border-b sticky top-0 z-40">
@@ -19,7 +74,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between w-full">
         {isSearchActive ? (
           <div className="flex-1 flex items-center space-x-4">
-            <button onClick={() => setIsSearchActive(false)} className="p-2">
+            <button onClick={handleCloseSearch} className="p-2">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex-1 relative">
@@ -28,9 +83,17 @@ const Navbar: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search products, brands, and categories..."
-                className="pl-10 h-10 w-full border-none bg-cloth-offwhite focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="pl-10 h-10 w-full border-none bg-cloth-offwhite focus-visible:ring-0 focus-visible:ring-offset-0 pr-10"
                 autoFocus
               />
+              {searchTerm && (
+                <button 
+                  onClick={handleClearSearch} 
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
+                >
+                  <X className="h-4 w-4 text-gray-400" />
+                </button>
+              )}
             </div>
           </div>
         ) : (
@@ -82,6 +145,74 @@ const Navbar: React.FC = () => {
                 </div>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search Results */}
+      {isSearchActive && (
+        <div className="bg-white border-t border-gray-200 absolute left-0 w-full max-h-[70vh] overflow-y-auto z-50 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            {searchTerm.trim() === '' ? (
+              <div className="py-8 text-center text-gray-500">
+                Start typing to search products
+              </div>
+            ) : isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center space-x-4">
+                    <Skeleton className="h-16 w-16" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredProducts.length > 0 ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">{filteredProducts.length} results found</p>
+                {filteredProducts.slice(0, 5).map((product) => (
+                  <div key={product.id}>
+                    <Link 
+                      to={`/product/${product.id}`}
+                      className="flex items-center space-x-4 hover:bg-gray-50 p-2 rounded-md"
+                      onClick={handleCloseSearch}
+                    >
+                      <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
+                        <img 
+                          src={product.image || '/placeholder.svg'} 
+                          alt={product.title} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{product.title}</h3>
+                        <p className="text-sm text-gray-500">{product.category}</p>
+                        <p className="font-medium">{product.currency} {product.price}</p>
+                      </div>
+                    </Link>
+                    <Separator className="my-2" />
+                  </div>
+                ))}
+                
+                {filteredProducts.length > 5 && (
+                  <div className="text-center pt-2">
+                    <Button 
+                      variant="link" 
+                      className="text-cloth-charcoal"
+                      onClick={handleCloseSearch}
+                    >
+                      See all {filteredProducts.length} results
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="py-8 text-center text-gray-500">
+                No products found for "{searchTerm}"
+              </div>
+            )}
           </div>
         </div>
       )}
