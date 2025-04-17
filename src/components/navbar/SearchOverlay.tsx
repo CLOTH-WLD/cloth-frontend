@@ -1,0 +1,135 @@
+
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { Separator } from '../ui/separator';
+import { Skeleton } from '../ui/skeleton';
+import { Product } from '@/types/product';
+import { getAllProducts } from '@/services/productService';
+import SearchInput from './SearchInput';
+
+interface SearchOverlayProps {
+  isActive: boolean;
+  onClose: () => void;
+}
+
+const SearchOverlay: React.FC<SearchOverlayProps> = ({ isActive, onClose }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const allProducts = await getAllProducts();
+        setProducts(allProducts);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    };
+    
+    if (isActive) {
+      fetchProducts();
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredProducts([]);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    const timer = setTimeout(() => {
+      const filtered = products.filter(product => 
+        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+      setIsLoading(false);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm, products]);
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+  };
+
+  return (
+    <>
+      <div className="flex-1 flex items-center space-x-4">
+        <button onClick={onClose} className="p-2">
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <SearchInput
+          value={searchTerm}
+          onChange={setSearchTerm}
+          onClear={handleClearSearch}
+          placeholder="Search products, brands, and categories..."
+          autoFocus
+        />
+      </div>
+      
+      <div className="fixed inset-0 bg-white z-40" style={{ top: '57px' }}>
+        <div className="h-full overflow-y-auto">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            {searchTerm.trim() === '' ? (
+              <div className="py-8 text-center text-gray-500">
+                Start typing to search products
+              </div>
+            ) : isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center space-x-4">
+                    <Skeleton className="h-16 w-16" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredProducts.length > 0 ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">{filteredProducts.length} results found</p>
+                {filteredProducts.map((product) => (
+                  <div key={product.id}>
+                    <Link 
+                      to={`/product/${product.id}`}
+                      className="flex items-center space-x-4 hover:bg-gray-50 p-2 rounded-md"
+                      onClick={onClose}
+                    >
+                      <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
+                        <img 
+                          src={product.image || '/placeholder.svg'} 
+                          alt={product.title} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{product.title}</h3>
+                        <p className="text-sm text-gray-500">{product.category}</p>
+                        <p className="font-medium">{product.currency} {product.price}</p>
+                      </div>
+                    </Link>
+                    <Separator className="my-2" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-8 text-center text-gray-500">
+                No products found for "{searchTerm}"
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SearchOverlay;
+
