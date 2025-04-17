@@ -10,6 +10,7 @@ import SearchOverlay from './navbar/SearchOverlay';
 const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   return (
     <>
@@ -44,21 +45,16 @@ const Navbar: React.FC = () => {
             <BurgerMenu />
             
             <div className="flex-1 relative">
-              {!isSearchActive ? (
-                <button 
-                  onClick={() => setIsSearchActive(true)}
-                  className="block w-full"
-                >
-                  <Input 
-                    placeholder="Search" 
-                    readOnly
-                    className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 cursor-pointer"
-                  />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <Search className="w-5 h-5 text-gray-500" />
-                  </div>
-                </button>
-              ) : null}
+              <Input 
+                placeholder="Search products, brands, and categories..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsSearchActive(true)}
+                className="h-12 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 pr-12"
+              />
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <Search className="w-5 h-5 text-gray-500" />
+              </div>
             </div>
           </div>
         </div>
@@ -67,7 +63,12 @@ const Navbar: React.FC = () => {
       {isSearchActive && (
         <SearchOverlay 
           isActive={isSearchActive} 
-          onClose={() => setIsSearchActive(false)} 
+          onClose={() => {
+            setIsSearchActive(false);
+            setSearchTerm('');
+          }}
+          searchTerm={searchTerm}
+          onSearchChange={(value) => setSearchTerm(value)}
         />
       )}
     </>

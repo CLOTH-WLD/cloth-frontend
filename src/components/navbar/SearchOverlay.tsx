@@ -1,20 +1,24 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { Skeleton } from '../ui/skeleton';
 import { Product } from '@/types/product';
 import { getAllProducts } from '@/services/productService';
-import SearchInput from './SearchInput';
 
 interface SearchOverlayProps {
   isActive: boolean;
   onClose: () => void;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
 }
 
-const SearchOverlay: React.FC<SearchOverlayProps> = ({ isActive, onClose }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const SearchOverlay: React.FC<SearchOverlayProps> = ({ 
+  isActive, 
+  onClose,
+  searchTerm,
+  onSearchChange
+}) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,10 +58,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isActive, onClose }) => {
     return () => clearTimeout(timer);
   }, [searchTerm, products]);
 
-  const handleClearSearch = () => {
-    setSearchTerm('');
-  };
-
   return (
     <div className="fixed inset-x-0 bottom-0 bg-white z-40" style={{ top: '109px' }}>
       <div className="border-b border-gray-200">
@@ -65,13 +65,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ isActive, onClose }) => {
           <button onClick={onClose} className="p-2">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <SearchInput
-            value={searchTerm}
-            onChange={setSearchTerm}
-            onClear={handleClearSearch}
-            placeholder="Search products, brands, and categories..."
-            autoFocus
-          />
         </div>
       </div>
       
