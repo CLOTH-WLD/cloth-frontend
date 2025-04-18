@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, User, Heart, Search, ArrowLeft } from 'lucide-react';
@@ -58,7 +57,7 @@ const Navbar: React.FC = () => {
             
             <div className="flex-1 relative">
               <Input 
-                placeholder="Search products, brands, and categories..." 
+                placeholder="Search products" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setIsSearchActive(true)}
