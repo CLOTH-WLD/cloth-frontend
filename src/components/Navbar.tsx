@@ -13,8 +13,9 @@ const Navbar: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   const handleCloseSearch = () => {
+    // Just trigger the close animation - the SearchOverlay component 
+    // will handle the animation timing before actually removing itself
     setIsSearchActive(false);
-    setSearchTerm('');
   };
   
   return (

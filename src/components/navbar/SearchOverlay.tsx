@@ -59,7 +59,20 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
     
     return () => clearTimeout(timer);
   }, [searchTerm, products]);
+  
+  // Add effect to handle animation state
+  useEffect(() => {
+    // If the overlay is not active and not in closing state, reset closing state
+    if (!isActive && isClosing) {
+      const timer = setTimeout(() => {
+        setIsClosing(false);
+      }, 300); // Match animation duration
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, isClosing]);
 
+  // Don't render anything if not active and not closing
   if (!isActive && !isClosing) {
     return null;
   }
@@ -68,7 +81,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
     setIsClosing(true);
     setTimeout(() => {
       onClose();
-    }, 300); // Match the animation duration
+    }, 300); // Match the animation duration from tailwind.config.ts
   };
 
   const animationClass = isClosing ? 'animate-slide-down' : 'animate-slide-up';
