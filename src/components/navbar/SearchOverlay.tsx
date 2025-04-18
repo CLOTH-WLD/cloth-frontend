@@ -60,7 +60,11 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
 
   return (
     <div 
-      className={`fixed inset-x-0 bottom-0 bg-white z-40 animate-slide-up`} 
+      className={`fixed inset-x-0 bottom-0 bg-white z-40 ${
+        isActive 
+          ? 'animate-slide-up' 
+          : 'animate-slide-down'
+      }`}
       style={{ top: '109px' }}
     >
       <div className="h-[calc(100vh-125px)] overflow-y-auto">
