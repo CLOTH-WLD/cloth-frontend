@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Separator } from '../ui/separator';
@@ -58,7 +59,10 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
   }, [searchTerm, products]);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 bg-white z-40" style={{ top: '109px' }}>
+    <div 
+      className={`fixed inset-x-0 bottom-0 bg-white z-40 animate-slide-up`} 
+      style={{ top: '109px' }}
+    >
       <div className="h-[calc(100vh-125px)] overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 py-4">
           {searchTerm.trim() === '' ? (
