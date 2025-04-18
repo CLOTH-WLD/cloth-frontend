@@ -22,6 +22,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,6 +35,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
     };
     
     if (isActive) {
+      setIsClosing(false);
       fetchProducts();
     }
   }, [isActive]);
@@ -58,13 +60,22 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
     return () => clearTimeout(timer);
   }, [searchTerm, products]);
 
+  if (!isActive && !isClosing) {
+    return null;
+  }
+
+  const handleCloseWithAnimation = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Match the animation duration
+  };
+
+  const animationClass = isClosing ? 'animate-slide-down' : 'animate-slide-up';
+
   return (
     <div 
-      className={`fixed inset-x-0 bottom-0 bg-white z-40 ${
-        isActive 
-          ? 'animate-slide-up' 
-          : 'animate-slide-down'
-      }`}
+      className={`fixed inset-x-0 bottom-0 bg-white z-40 ${animationClass}`}
       style={{ top: '109px' }}
     >
       <div className="h-[calc(100vh-125px)] overflow-y-auto">
@@ -93,7 +104,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
                   <Link 
                     to={`/product/${product.id}`}
                     className="flex items-center space-x-4 hover:bg-gray-50 p-2 rounded-md"
-                    onClick={onClose}
+                    onClick={handleCloseWithAnimation}
                   >
                     <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
                       <img 

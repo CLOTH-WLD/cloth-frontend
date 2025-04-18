@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, User, Heart, Search, ArrowLeft } from 'lucide-react';
@@ -10,6 +11,11 @@ const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const handleCloseSearch = () => {
+    setIsSearchActive(false);
+    setSearchTerm('');
+  };
   
   return (
     <>
@@ -45,10 +51,7 @@ const Navbar: React.FC = () => {
               <BurgerMenu />
             ) : (
               <button 
-                onClick={() => {
-                  setIsSearchActive(false);
-                  setSearchTerm('');
-                }} 
+                onClick={handleCloseSearch} 
                 className="p-3"
               >
                 <ArrowLeft className="w-6 h-6" />
@@ -71,17 +74,12 @@ const Navbar: React.FC = () => {
         </div>
       </header>
       
-      {isSearchActive && (
-        <SearchOverlay 
-          isActive={isSearchActive} 
-          onClose={() => {
-            setIsSearchActive(false);
-            setSearchTerm('');
-          }}
-          searchTerm={searchTerm}
-          onSearchChange={(value) => setSearchTerm(value)}
-        />
-      )}
+      <SearchOverlay 
+        isActive={isSearchActive} 
+        onClose={handleCloseSearch}
+        searchTerm={searchTerm}
+        onSearchChange={(value) => setSearchTerm(value)}
+      />
     </>
   );
 };
