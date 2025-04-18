@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -98,17 +97,21 @@ const ProductDetail: React.FC = () => {
   
   const handleColorChange = (color: ProductColor) => {
     if (color.name !== selectedColor?.name) {
-      // Navigate to the product associated with this color
-      navigate(`/product/${color.id || id}`);
+      setSelectedColor(color);
+      // Check if the color has an ID for navigation
+      if (color.id) {
+        navigate(`/product/${color.id}`);
+      } else {
+        // If no specific ID for the color, just update the selected color without navigation
+        console.log(`Color ${color.name} has no associated product ID`);
+      }
     }
   };
   
-  // Images to display in carousel
   const imagesToDisplay = selectedColor && product?.images 
     ? [selectedColor.image, ...product.images.filter(img => img !== selectedColor.image)]
     : product?.images || [product?.image || ''];
   
-  // Set up the carousel API reference
   const handleCarouselApi = useCallback((api: any) => {
     if (!api) return;
     
