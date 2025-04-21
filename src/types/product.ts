@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   title: string;
@@ -53,4 +52,31 @@ export interface OrderConfirmation {
   status: string;
   paymentMethod: string;
   date: string;
+}
+
+export interface CollectionResponse {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  products: ShopifyProduct[];
+  hasNextPage: boolean;
+  nextCursor: string;
+}
+
+export interface ShopifyProduct {
+  id: string;
+  title: string;
+  description: string;
+  images: string[];
+  variants: ShopifyVariant[];
+}
+
+export interface ShopifyVariant {
+  id: string;
+  size: string;
+  color: string;
+  price: string;
+  compareAtPrice: string;
+  available: boolean;
 }
