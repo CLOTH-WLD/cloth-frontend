@@ -5,9 +5,13 @@ async function backendRequest<T>(
   method: HttpMethod,
   path: string,
   paramsOrBody: RequestParams = {},
-  options: { retries?: number; retryDelay?: number } = {}
+  options: {
+    retries?: number;
+    retryDelay?: number;
+    headers?: Record<string, string>;
+  } = {}
 ): Promise<BackendResponse<T>> {
-  const { retries = 2, retryDelay = 1000 } = options;
+  const { retries = 2, retryDelay = 1000, headers = {} } = options;
   let lastError: Error | null = null;
   let attempt = 0;
 
@@ -36,9 +40,13 @@ async function backendRequest<T>(
 
       const requestOptions: RequestInit = {
         method,
-        ...(method === "POST"
+        headers,
+        ...(method === "POST" || method === "PATCH" || method === "DELETE"
           ? {
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                ...headers,
+              },
               body: JSON.stringify(paramsOrBody),
             }
           : {}),
