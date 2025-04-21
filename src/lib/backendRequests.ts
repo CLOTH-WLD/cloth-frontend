@@ -29,8 +29,9 @@ interface ShopifyParams extends RequestParams {
 }
 
 interface SearchByTagsParams {
-  tags: string;
+  tags: string[];
   first?: number;
+  after?: string;
 }
 
 export const getProducts = async (
@@ -442,10 +443,16 @@ export const confirmCheckout = async (
 export const searchProductsByTags = async (
   params: SearchByTagsParams
 ): Promise<Product[]> => {
+  const { tags, first, after } = params;
+
   const response = await backendRequest<Product[]>(
     "GET",
     "shop/search-by-tags",
-    params
+    {
+      tags: tags.join(","),
+      first,
+      after,
+    }
   );
 
   if (!response.data) {
