@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -46,17 +45,12 @@ const Index: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await getCollectionProducts('men', { first: 16 });
+        const collectionData = await getCollectionProducts('men', { first: 16 });
         
-        // The structure of the response has changed - we need to access response.products
-        console.log('Raw API response:', response);
-        
-        if (!response || !response.products) {
-          throw new Error('Invalid API response structure');
-        }
+        console.log('Raw API response:', collectionData);
         
         // Transform products to match our frontend structure
-        const transformedProducts = response.products.map(shopifyProduct => ({
+        const transformedProducts = collectionData.products.map(shopifyProduct => ({
           id: shopifyProduct.id,
           title: shopifyProduct.title,
           description: shopifyProduct.description,

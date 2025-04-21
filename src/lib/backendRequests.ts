@@ -1,3 +1,4 @@
+
 import backendRequest from "@/lib/request";
 import {
   AddToCartPayload,
@@ -6,6 +7,7 @@ import {
   CheckoutConfirmation,
   CheckoutSession,
   Collection,
+  CollectionResponse,
   ConfirmCheckoutPayload,
   InitiateCheckoutPayload,
   NonceResponse,
@@ -73,8 +75,8 @@ export const getCollections = async (
 export const getCollectionProducts = async (
   collectionHandle: string,
   params: ShopifyParams = {}
-): Promise<Product[]> => {
-  const response = await backendRequest<Product[]>(
+): Promise<CollectionResponse> => {
+  const response = await backendRequest<CollectionResponse>(
     "GET",
     `shop/collections/${collectionHandle}`,
     params
