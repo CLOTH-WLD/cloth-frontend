@@ -48,8 +48,15 @@ const Index: React.FC = () => {
         setError(null);
         const response = await getCollectionProducts('men', { first: 16 });
         
+        // The structure of the response has changed - we need to access response.products
+        console.log('Raw API response:', response);
+        
+        if (!response || !response.products) {
+          throw new Error('Invalid API response structure');
+        }
+        
         // Transform products to match our frontend structure
-        const transformedProducts = response.map(shopifyProduct => ({
+        const transformedProducts = response.products.map(shopifyProduct => ({
           id: shopifyProduct.id,
           title: shopifyProduct.title,
           description: shopifyProduct.description,
