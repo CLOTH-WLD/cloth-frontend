@@ -1,0 +1,10 @@
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+[context.production.environment]
+VITE_WORLDCOIN_APP_ID = "app_19e254697a124f9d955788713940dc4e"
+VITE_TREASURY_ADDRESS = "0xf0c7db5acea62029058b0e4e0b79f2bac18686c4"
+VITE_BACKEND_URL = "https://cloth-backend.danielhigheth.workers.dev"
+VITE_ENVIRONMENT = "production"
