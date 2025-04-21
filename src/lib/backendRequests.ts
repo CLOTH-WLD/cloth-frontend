@@ -28,6 +28,11 @@ interface ShopifyParams extends RequestParams {
   first?: number;
 }
 
+interface SearchByTagsParams {
+  tags: string;
+  first?: number;
+}
+
 export const getProducts = async (
   params: ShopifyParams = {}
 ): Promise<Product[]> => {
@@ -190,12 +195,11 @@ export const verifyWorldcoinProof = async (
     "worldcoin/verify",
     payload,
     {
-      // Pass the Authorization token via a global fetch wrapper or add support if needed
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    } // Casting to `any` because your current backendRequest doesn’t yet support custom headers.
+    }
   );
 
   if (!response.data) {
@@ -429,6 +433,24 @@ export const confirmCheckout = async (
   if (!response.data) {
     throw new Error(
       `Failed to confirm checkout. Status: ${response.status}, Message: ${response.message}`
+    );
+  }
+
+  return response.data;
+};
+
+export const searchProductsByTags = async (
+  params: SearchByTagsParams
+): Promise<Product[]> => {
+  const response = await backendRequest<Product[]>(
+    "GET",
+    "shop/search-by-tags",
+    params
+  );
+
+  if (!response.data) {
+    throw new Error(
+      `Failed to search products by tags. Status: ${response.status}, Message: ${response.message}`
     );
   }
 
