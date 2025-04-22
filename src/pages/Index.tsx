@@ -51,12 +51,14 @@ const Index: React.FC = () => {
         
         // Transform products to match our frontend structure
         const transformedProducts = collectionData.products.map(shopifyProduct => {
-          // Get the price and compareAtPrice from the first variant
-          const variantPrice = parseFloat(shopifyProduct.variants[0]?.price || '0');
-          const variantCompareAtPrice = parseFloat(shopifyProduct.variants[0]?.compareAtPrice || '0');
+          const firstVariant = shopifyProduct.variants[0];
+          const price = parseFloat(firstVariant?.price || '0');
+          const compareAtPrice = parseFloat(firstVariant?.compareAtPrice || '0');
           
-          // Calculate discount percentage only if compareAtPrice is higher than price
-          const discountPercentage = calculateDiscount(variantPrice, variantCompareAtPrice);
+          // Calculate discount percentage only if compareAtPrice exists and is higher than price
+          const discountPercentage = compareAtPrice > price
+            ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+            : undefined;
           
           return {
             id: shopifyProduct.id,
@@ -64,8 +66,8 @@ const Index: React.FC = () => {
             description: shopifyProduct.description,
             image: shopifyProduct.images[0] || '',
             images: shopifyProduct.images,
-            // Use the actual price from the API
-            price: variantPrice,
+            price: price,
+            compareAtPrice: compareAtPrice > price ? compareAtPrice : undefined,
             currency: 'USD',
             category: 'Men',
             inStock: shopifyProduct.variants.some(v => v.available),
@@ -97,11 +99,6 @@ const Index: React.FC = () => {
     
     fetchProducts();
   }, [navigate, toast]);
-  
-  const calculateDiscount = (price: number, compareAtPrice: number): number | undefined => {
-    if (!compareAtPrice || compareAtPrice <= price) return undefined;
-    return Math.round(((compareAtPrice - price) / compareAtPrice) * 100);
-  };
   
   return (
     <div className="min-h-screen flex flex-col">

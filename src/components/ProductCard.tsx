@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Product } from '@/types/product';
 import { Heart } from 'lucide-react';
@@ -15,11 +14,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
-  const hasDiscount = product.discountPercentage && product.discountPercentage > 0;
-  const originalPrice = product.price;
-  // Fix: The discountedPrice is now the actual price and we don't need to recalculate it
-  const discountedPrice = product.price;
-  
+  const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
   const { toast } = useToast();
   
   const handleAddToFavorites = async (e: React.MouseEvent) => {
@@ -71,7 +66,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
             />
           </Button>
           
-          {hasDiscount && (
+          {product.discountPercentage && (
             <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-bold">
               {product.discountPercentage}% OFF
             </div>
@@ -81,11 +76,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           <h3 className="font-helvetica text-sm leading-tight h-10">{truncateTitle(product.title)}</h3>
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium">
-              {formatCurrency(discountedPrice)}
+              {formatCurrency(product.price)}
             </p>
-            {hasDiscount && (
+            {hasDiscount && product.compareAtPrice && (
               <p className="text-xs text-gray-500 line-through">
-                {formatCurrency(originalPrice * (1 / (1 - (product.discountPercentage as number) / 100)))}
+                {formatCurrency(product.compareAtPrice)}
               </p>
             )}
           </div>
