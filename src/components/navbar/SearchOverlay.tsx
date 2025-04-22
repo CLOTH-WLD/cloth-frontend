@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Separator } from '../ui/separator';
 import { Skeleton } from '../ui/skeleton';
-import { Product } from '@/types/product';
-import { getAllProducts } from '@/services/productService';
+import { searchProducts } from '@/lib/backendRequests';
+import { ShopifyProduct } from '@/types/request';
+import { useToast } from '@/hooks/use-toast';
 
 interface SearchOverlayProps {
   isActive: boolean;
@@ -19,46 +20,41 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
   searchTerm,
   onSearchChange
 }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const allProducts = await getAllProducts();
-        setProducts(allProducts);
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      }
-    };
-    
-    if (isActive) {
-      setIsClosing(false);
-      fetchProducts();
-    }
-  }, [isActive]);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!searchTerm.trim()) {
-      setFilteredProducts([]);
+      setProducts([]);
       return;
     }
     
     setIsLoading(true);
     
-    const timer = setTimeout(() => {
-      const filtered = products.filter(product => 
-        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredProducts(filtered);
-      setIsLoading(false);
+    const timer = setTimeout(async () => {
+      try {
+        const searchResults = await searchProducts({ 
+          query: searchTerm,
+          first: 30
+        });
+        
+        setProducts(searchResults.products || []);
+      } catch (error) {
+        console.error('Failed to search products:', error);
+        toast({
+          variant: "destructive",
+          title: "Search Failed",
+          description: "Unable to search products. Please try again later."
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }, 300);
     
     return () => clearTimeout(timer);
-  }, [searchTerm, products]);
+  }, [searchTerm, toast]);
   
   // Add effect to handle animation state
   useEffect(() => {
@@ -109,27 +105,40 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
                 </div>
               ))}
             </div>
-          ) : filteredProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <div className="space-y-4">
-              <p className="text-sm text-gray-500">{filteredProducts.length} results found</p>
-              {filteredProducts.map((product) => (
+              <p className="text-sm text-gray-500">{products.length} results found</p>
+              {products.map((product) => (
                 <div key={product.id}>
                   <Link 
-                    to={`/product/${product.id}`}
+                    to={`/product/${product.handle}`}
                     className="flex items-center space-x-4 hover:bg-gray-50 p-2 rounded-md"
                     onClick={handleCloseWithAnimation}
                   >
                     <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
                       <img 
-                        src={product.image || '/placeholder.svg'} 
+                        src={product.images?.[0] || '/placeholder.svg'} 
                         alt={product.title} 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div>
                       <h3 className="font-medium">{product.title}</h3>
-                      <p className="text-sm text-gray-500">{product.category}</p>
-                      <p className="font-medium">{product.currency} {product.price}</p>
+                      {product.collections && product.collections.length > 0 && (
+                        <p className="text-sm text-gray-500">{product.collections[0].title}</p>
+                      )}
+                      {product.variants && product.variants.length > 0 && (
+                        <p className="font-medium">
+                          ${parseFloat(product.variants[0].price).toFixed(2)}
+                          {product.variants[0].compareAtPrice && 
+                            parseFloat(product.variants[0].compareAtPrice) > parseFloat(product.variants[0].price) && (
+                              <span className="line-through text-gray-500 text-sm ml-2">
+                                ${parseFloat(product.variants[0].compareAtPrice).toFixed(2)}
+                              </span>
+                            )
+                          }
+                        </p>
+                      )}
                     </div>
                   </Link>
                   <Separator className="my-2" />

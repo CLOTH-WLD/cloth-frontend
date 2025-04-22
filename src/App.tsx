@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +16,6 @@ import Faq from "./pages/Faq";
 import OrderDetail from "./pages/OrderDetail";
 import WomenLanding from "./pages/WomenLanding";
 import MenLanding from "./pages/MenLanding";
-import KidsLanding from "./pages/KidsLanding";
 import CategoryPage from "./pages/CategoryPage";
 import { CartProvider } from "./context/CartContext";
 
@@ -44,7 +44,6 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/women" element={<WomenLanding />} />
               <Route path="/men" element={<MenLanding />} />
-              <Route path="/kids" element={<KidsLanding />} />
               <Route path="/category/:category" element={<CategoryPage />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />

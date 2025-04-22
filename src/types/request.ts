@@ -1,3 +1,4 @@
+
 export interface BackendResponse<T> {
   status: number;
   message: string;
@@ -130,6 +131,8 @@ export interface ShopifyProduct {
   description: string;
   images: string[];
   variants: ShopifyVariant[];
+  handle: string;
+  collections?: ShopifyCollection[];
 }
 
 export interface ShopifyVariant {
@@ -139,4 +142,16 @@ export interface ShopifyVariant {
   price: string;
   compareAtPrice: string;
   available: boolean;
+}
+
+export interface ShopifyCollection {
+  id: string;
+  title: string;
+  handle: string;
+}
+
+export interface SearchProductsResponse {
+  products: ShopifyProduct[];
+  hasNextPage: boolean;
+  nextCursor: string;
 }

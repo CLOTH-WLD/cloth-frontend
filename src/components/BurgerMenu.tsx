@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Category data structure
-type CategoryType = 'women' | 'men' | 'kids';
+type CategoryType = 'women' | 'men';
 
 interface Category {
   name: string;
@@ -21,8 +21,6 @@ const categories: Category[] = [
   { name: "Men's shoes", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=400&auto=format", type: 'men' },
   { name: "Men's t-shirts", image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=400&auto=format", type: 'men' },
   { name: "Men's jeans", image: "https://images.unsplash.com/photo-1511196044526-5cb3bcb7071b?q=80&w=400&auto=format", type: 'men' },
-  { name: "Kids' clothing", image: "https://images.unsplash.com/photo-1543269664-56d93c1b41a6?q=80&w=400&auto=format", type: 'kids' },
-  { name: "Kids' shoes", image: "https://images.unsplash.com/photo-1551854838-212c50b4c184?q=80&w=400&auto=format", type: 'kids' },
 ];
 
 const BurgerMenu: React.FC = () => {
@@ -62,7 +60,7 @@ const BurgerMenu: React.FC = () => {
           
           {/* Filter tabs */}
           <div className="flex border-b">
-            {(['all', 'women', 'men', 'kids'] as const).map((type) => (
+            {(['all', 'women', 'men'] as const).map((type) => (
               <button
                 key={type}
                 className={`flex-1 py-3 text-center ${

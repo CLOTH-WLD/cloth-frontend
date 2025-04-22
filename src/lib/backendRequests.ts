@@ -113,8 +113,8 @@ interface SearchProductsParams extends RequestParams {
 
 export const searchProducts = async (
   params: SearchProductsParams
-): Promise<Product[]> => {
-  const response = await backendRequest<Product[]>(
+): Promise<SearchProductsResponse> => {
+  const response = await backendRequest<SearchProductsResponse>(
     "GET",
     "shop/search",
     params

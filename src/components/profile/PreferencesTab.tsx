@@ -37,9 +37,6 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ userPreference, setUser
       case 'men':
         navigate('/men');
         break;
-      case 'kids':
-        navigate('/kids');
-        break;
       default:
         navigate('/');
     }
@@ -65,10 +62,6 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ userPreference, setUser
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="men" id="men" />
               <Label htmlFor="men">Men's Fashion</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="kids" id="kids" />
-              <Label htmlFor="kids">Kids' Fashion</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="general" id="general" />
