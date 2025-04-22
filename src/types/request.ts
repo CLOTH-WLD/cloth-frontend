@@ -1,4 +1,3 @@
-
 export interface BackendResponse<T> {
   status: number;
   message: string;
@@ -163,4 +162,8 @@ export interface ShopifyProductDetail {
   handle: string;
   images: string[];
   variants: ShopifyVariant[];
+}
+
+export interface ShopifyCollection {
+  [key: string]: any;
 }

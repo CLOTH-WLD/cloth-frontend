@@ -24,6 +24,7 @@ import {
   VerifyWorldcoinPayload,
   WorldcoinPrices,
   WorldcoinVerificationResponse,
+  ShopifyCollection,
 } from "@/types/request";
 
 interface ShopifyParams extends RequestParams {
@@ -92,7 +93,9 @@ export const getCollectionProducts = async (
   return response.data;
 };
 
-export const getProductByHandle = async (handle: string): Promise<ShopifyProductDetail> => {
+export const getProductByHandle = async (
+  handle: string
+): Promise<ShopifyProductDetail> => {
   const response = await backendRequest<ShopifyProductDetail>(
     "GET",
     `shop/product/${handle}`
@@ -461,6 +464,40 @@ export const searchProductsByTags = async (
   if (!response.data) {
     throw new Error(
       `Failed to search products by tags. Status: ${response.status}, Message: ${response.message}`
+    );
+  }
+
+  return response.data;
+};
+
+export const getProductById = async (
+  productId: string
+): Promise<ShopifyProductDetail> => {
+  const response = await backendRequest<ShopifyProductDetail>(
+    "GET",
+    `shop/product/${productId}`
+  );
+
+  if (!response.data) {
+    throw new Error(
+      `Failed to fetch product by ID. Status: ${response.status}, Message: ${response.message}`
+    );
+  }
+
+  return response.data;
+};
+
+export const getCollectionById = async (
+  collectionId: string
+): Promise<ShopifyCollection> => {
+  const response = await backendRequest<ShopifyCollection>(
+    "GET",
+    `shop/collections/${collectionId}`
+  );
+
+  if (!response.data) {
+    throw new Error(
+      `Failed to fetch collection by ID. Status: ${response.status}, Message: ${response.message}`
     );
   }
 
