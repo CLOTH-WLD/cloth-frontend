@@ -50,29 +50,36 @@ const Index: React.FC = () => {
         console.log('Raw API response:', collectionData);
         
         // Transform products to match our frontend structure
-        const transformedProducts = collectionData.products.map(shopifyProduct => ({
-          id: shopifyProduct.id,
-          title: shopifyProduct.title,
-          description: shopifyProduct.description,
-          image: shopifyProduct.images[0] || '',
-          images: shopifyProduct.images,
-          price: parseFloat(shopifyProduct.variants[0]?.price || '0'),
-          currency: 'USD',
-          category: 'Men',
-          inStock: shopifyProduct.variants.some(v => v.available),
-          variants: shopifyProduct.variants.map(v => ({
-            id: v.id,
-            title: `${v.size} / ${v.color}`,
-            price: parseFloat(v.price),
-            available: v.available,
-            option1: v.size,
-            option2: v.color
-          })),
-          discountPercentage: calculateDiscount(
-            parseFloat(shopifyProduct.variants[0]?.price || '0'),
-            parseFloat(shopifyProduct.variants[0]?.compareAtPrice || '0')
-          )
-        }));
+        const transformedProducts = collectionData.products.map(shopifyProduct => {
+          // Get the price and compareAtPrice from the first variant
+          const variantPrice = parseFloat(shopifyProduct.variants[0]?.price || '0');
+          const variantCompareAtPrice = parseFloat(shopifyProduct.variants[0]?.compareAtPrice || '0');
+          
+          // Calculate discount percentage only if compareAtPrice is higher than price
+          const discountPercentage = calculateDiscount(variantPrice, variantCompareAtPrice);
+          
+          return {
+            id: shopifyProduct.id,
+            title: shopifyProduct.title,
+            description: shopifyProduct.description,
+            image: shopifyProduct.images[0] || '',
+            images: shopifyProduct.images,
+            // Use the actual price from the API
+            price: variantPrice,
+            currency: 'USD',
+            category: 'Men',
+            inStock: shopifyProduct.variants.some(v => v.available),
+            variants: shopifyProduct.variants.map(v => ({
+              id: v.id,
+              title: `${v.size} / ${v.color}`,
+              price: parseFloat(v.price),
+              available: v.available,
+              option1: v.size,
+              option2: v.color
+            })),
+            discountPercentage
+          };
+        });
         
         setProducts(transformedProducts);
       } catch (error) {

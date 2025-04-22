@@ -17,9 +17,8 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
   const hasDiscount = product.discountPercentage && product.discountPercentage > 0;
   const originalPrice = product.price;
-  const discountedPrice = hasDiscount 
-    ? product.price * (1 - (product.discountPercentage as number) / 100) 
-    : product.price;
+  // Fix: The discountedPrice is now the actual price and we don't need to recalculate it
+  const discountedPrice = product.price;
   
   const { toast } = useToast();
   
@@ -86,7 +85,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
             </p>
             {hasDiscount && (
               <p className="text-xs text-gray-500 line-through">
-                {formatCurrency(originalPrice)}
+                {formatCurrency(originalPrice * (1 / (1 - (product.discountPercentage as number) / 100)))}
               </p>
             )}
           </div>

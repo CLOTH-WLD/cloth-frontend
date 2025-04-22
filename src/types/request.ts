@@ -113,3 +113,13 @@ export interface ConfirmCheckoutPayload {
 export interface CheckoutConfirmation {
   [key: string]: any;
 }
+
+export interface CollectionResponse {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  products: ShopifyProduct[];
+  hasNextPage: boolean;
+  nextCursor: string;
+}
