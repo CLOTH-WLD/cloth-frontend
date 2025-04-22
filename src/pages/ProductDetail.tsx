@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getProductByHandle } from '@/lib/backendRequests'; 
 import { toggleFavorite } from '@/services/productService';
-import { ProductVariant } from '@/types/product';
+import { Product, ProductVariant, ShopifyVariant } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { ArrowLeft, Heart, ShoppingBag, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -68,11 +68,24 @@ const ProductDetail: React.FC = () => {
   // Update selected variant when size or color changes
   useEffect(() => {
     if (product && selectedColor && selectedSize) {
-      const variant = product.variants.find(v => 
+      const shopifyVariant = product.variants.find(v => 
         v.color === selectedColor && v.size === selectedSize
       );
       
-      setSelectedVariant(variant || null);
+      if (shopifyVariant) {
+        // Convert ShopifyVariant to ProductVariant, converting price from string to number
+        const variant: ProductVariant = {
+          id: shopifyVariant.id,
+          price: parseFloat(shopifyVariant.price),
+          compareAtPrice: shopifyVariant.compareAtPrice ? parseFloat(shopifyVariant.compareAtPrice) : undefined,
+          available: shopifyVariant.available,
+          size: shopifyVariant.size,
+          color: shopifyVariant.color
+        };
+        setSelectedVariant(variant);
+      } else {
+        setSelectedVariant(null);
+      }
     } else {
       setSelectedVariant(null);
     }
@@ -100,7 +113,7 @@ const ProductDetail: React.FC = () => {
   };
   
   // Get variant by color and size
-  const getVariantByColorAndSize = (color: string, size: string): ProductVariant | undefined => {
+  const getVariantByColorAndSize = (color: string, size: string): ShopifyVariant | undefined => {
     return product?.variants.find(v => v.color === color && v.size === size);
   };
   
@@ -112,7 +125,7 @@ const ProductDetail: React.FC = () => {
   };
   
   // Get selected variant price
-  const getPrice = (): { price: string, compareAtPrice?: string } => {
+  const getPrice = (): { price: number, compareAtPrice?: number } => {
     if (selectedVariant) {
       return {
         price: selectedVariant.price,
@@ -123,20 +136,20 @@ const ProductDetail: React.FC = () => {
     // Default to first variant if none selected
     if (product && product.variants.length > 0) {
       return {
-        price: product.variants[0].price,
-        compareAtPrice: product.variants[0].compareAtPrice
+        price: parseFloat(product.variants[0].price),
+        compareAtPrice: product.variants[0].compareAtPrice ? parseFloat(product.variants[0].compareAtPrice) : undefined
       };
     }
     
-    return { price: '0.0' };
+    return { price: 0 };
   };
   
   // Calculate discount percentage
   const getDiscountPercentage = (): number | null => {
     const { price, compareAtPrice } = getPrice();
     
-    if (compareAtPrice && parseFloat(compareAtPrice) > parseFloat(price)) {
-      const discount = 100 - (parseFloat(price) * 100 / parseFloat(compareAtPrice));
+    if (compareAtPrice && compareAtPrice > price) {
+      const discount = 100 - (price * 100 / compareAtPrice);
       return Math.round(discount);
     }
     
@@ -161,8 +174,8 @@ const ProductDetail: React.FC = () => {
           id: product.id,
           title: product.title,
           description: product.description,
-          price: parseFloat(selectedVariant.price),
-          compareAtPrice: selectedVariant.compareAtPrice ? parseFloat(selectedVariant.compareAtPrice) : undefined,
+          price: selectedVariant.price,
+          compareAtPrice: selectedVariant.compareAtPrice,
           currency: 'USD',
           image: product.images[0],
           category: '',
@@ -350,12 +363,12 @@ const ProductDetail: React.FC = () => {
             
             <div className="flex items-center mb-4">
               <p className="text-xl font-medium">
-                {formatCurrency(parseFloat(price))}
+                {formatCurrency(price)}
               </p>
               
-              {compareAtPrice && parseFloat(compareAtPrice) > parseFloat(price) && (
+              {compareAtPrice && compareAtPrice > price && (
                 <p className="text-gray-500 line-through ml-3">
-                  {formatCurrency(parseFloat(compareAtPrice))}
+                  {formatCurrency(compareAtPrice)}
                 </p>
               )}
             </div>

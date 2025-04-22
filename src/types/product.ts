@@ -28,8 +28,8 @@ export interface ProductColor {
 export interface ProductVariant {
   id: string;
   title?: string;
-  price: number;
-  compareAtPrice?: number;
+  price: number;  // Keep as number for consistency with Product interface
+  compareAtPrice?: number;  // Keep as number for consistency
   available: boolean;
   size?: string;
   color?: string;
@@ -85,7 +85,7 @@ export interface ShopifyVariant {
   id: string;
   size: string;
   color: string;
-  price: string;
-  compareAtPrice: string;
+  price: string;     // This is a string from the API
+  compareAtPrice: string;  // This is a string from the API
   available: boolean;
 }
