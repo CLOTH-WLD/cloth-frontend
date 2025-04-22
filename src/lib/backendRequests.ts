@@ -1,4 +1,3 @@
-
 import backendRequest from "@/lib/request";
 import {
   AddToCartPayload,
@@ -14,6 +13,7 @@ import {
   Product,
   RemoveCartItemPayload,
   RequestParams,
+  SearchProductsResponse,
   ShopFilters,
   UpdateEmailPayload,
   UpdatePreferencePayload,
