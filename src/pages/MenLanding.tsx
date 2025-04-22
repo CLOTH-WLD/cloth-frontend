@@ -1,57 +1,132 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types/product';
-import { getAllProducts } from '@/services/productService';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTopButton from '@/components/ScrollToTopButton';
 import NotificationBanner from '@/components/NotificationBanner';
 import { useEffect, useState } from 'react';
 import CategoryList from '@/components/CategoryList';
+import { getCollectionProducts } from '@/lib/backendRequests';
+import { useToast } from '@/hooks/use-toast';
 
 const MenLanding: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [essentials, setEssentials] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [essentialsLoading, setEssentialsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const categoryFilter = searchParams.get('category');
+  const { toast } = useToast();
   
   useEffect(() => {
-    // Save the preference locally
     localStorage.setItem('userPreference', 'men');
     
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const data = await getAllProducts();
-        setProducts(data);
+        const collectionData = await getCollectionProducts('men', { first: 16 });
+        
+        const transformedProducts = collectionData.products.map(shopifyProduct => {
+          const firstVariant = shopifyProduct.variants[0];
+          const price = parseFloat(firstVariant?.price || '0');
+          const compareAtPrice = parseFloat(firstVariant?.compareAtPrice || '0');
+          
+          const discountPercentage = compareAtPrice > price
+            ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+            : undefined;
+          
+          return {
+            id: shopifyProduct.id,
+            title: shopifyProduct.title,
+            description: shopifyProduct.description,
+            image: shopifyProduct.images[0] || '',
+            images: shopifyProduct.images,
+            price: price,
+            compareAtPrice: compareAtPrice > price ? compareAtPrice : undefined,
+            currency: 'USD',
+            category: 'Men',
+            inStock: shopifyProduct.variants.some(v => v.available),
+            discountPercentage,
+            variants: shopifyProduct.variants.map(v => ({
+              id: v.id,
+              title: `${v.size} / ${v.color}`,
+              price: parseFloat(v.price),
+              available: v.available,
+              option1: v.size,
+              option2: v.color
+            }))
+          };
+        });
+        
+        setProducts(transformedProducts);
       } catch (error) {
         console.error('Failed to fetch products:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load products. Please try again later."
+        });
       } finally {
         setLoading(false);
       }
     };
     
-    fetchProducts();
-  }, []);
-  
-  useEffect(() => {
-    // Filter products for men
-    const menProducts = products.filter(product => 
-      product.category.toLowerCase().includes('men')
-    );
+    const fetchEssentials = async () => {
+      try {
+        setEssentialsLoading(true);
+        const essentialsData = await getCollectionProducts('essentials', { first: 16 });
+        
+        const transformedEssentials = essentialsData.products.map(shopifyProduct => {
+          const firstVariant = shopifyProduct.variants[0];
+          const price = parseFloat(firstVariant?.price || '0');
+          const compareAtPrice = parseFloat(firstVariant?.compareAtPrice || '0');
+          
+          const discountPercentage = compareAtPrice > price
+            ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+            : undefined;
+          
+          return {
+            id: shopifyProduct.id,
+            title: shopifyProduct.title,
+            description: shopifyProduct.description,
+            image: shopifyProduct.images[0] || '',
+            images: shopifyProduct.images,
+            price: price,
+            compareAtPrice: compareAtPrice > price ? compareAtPrice : undefined,
+            currency: 'USD',
+            category: 'Men',
+            inStock: shopifyProduct.variants.some(v => v.available),
+            discountPercentage,
+            variants: shopifyProduct.variants.map(v => ({
+              id: v.id,
+              title: `${v.size} / ${v.color}`,
+              price: parseFloat(v.price),
+              available: v.available,
+              option1: v.size,
+              option2: v.color
+            }))
+          };
+        });
+        
+        setEssentials(transformedEssentials);
+      } catch (error) {
+        console.error('Failed to fetch essentials:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load seasonal essentials. Please try again later."
+        });
+      } finally {
+        setEssentialsLoading(false);
+      }
+    };
     
-    if (categoryFilter && categoryFilter !== 'all') {
-      setFilteredProducts(menProducts.filter(product => 
-        product.category.toLowerCase().includes(categoryFilter.toLowerCase())
-      ));
-    } else {
-      setFilteredProducts(menProducts);
-    }
-  }, [products, categoryFilter]);
+    fetchProducts();
+    fetchEssentials();
+  }, [toast]);
   
   const menCategories = [
     "Men's shoes",
@@ -106,9 +181,9 @@ const MenLanding: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : filteredProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {filteredProducts.slice(0, 8).map((product, index) => (
+              {products.slice(0, 8).map((product, index) => (
                 <ProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
@@ -122,14 +197,27 @@ const MenLanding: React.FC = () => {
         {/* Seasonal Essentials Section */}
         <div className="py-10 px-4 sm:px-6 max-w-7xl mx-auto bg-cloth-lightbeige">
           <h2 className="text-2xl font-semibold tracking-tight mb-8">Seasonal Essentials</h2>
-          {!loading && products.length > 0 && (
+          {essentialsLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {products
-                .filter(product => product.category.toLowerCase().includes('men'))
-                .slice(8, 16)
-                .map((product, index) => (
-                  <ProductCard key={product.id} product={product} index={index} />
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="product-card animate-pulse">
+                  <div className="bg-cloth-lightgray aspect-[3/4] w-full rounded-md"></div>
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-cloth-lightgray rounded w-3/4"></div>
+                    <div className="h-4 bg-cloth-lightgray rounded w-1/4"></div>
+                  </div>
+                </div>
               ))}
+            </div>
+          ) : essentials.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {essentials.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-cloth-mediumgray">No seasonal essentials found</p>
             </div>
           )}
         </div>
@@ -140,13 +228,10 @@ const MenLanding: React.FC = () => {
           <CategoryList categories={menCategories} />
         </div>
         
-        {/* Notification Banner */}
         <NotificationBanner />
       </main>
       
       <Footer />
-      
-      {/* Scroll to Top Button */}
       <ScrollToTopButton />
     </div>
   );
