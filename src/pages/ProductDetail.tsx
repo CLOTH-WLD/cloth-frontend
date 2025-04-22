@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getProductById, toggleFavorite } from '@/services/productService';
-import { Product, ProductColor } from '@/types/product';
+import { getProductByHandle } from '@/lib/backendRequests'; 
+import { toggleFavorite } from '@/services/productService';
+import { ProductVariant } from '@/types/product';
 import { useCart } from '@/context/CartContext';
-import { ArrowLeft, Heart, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Heart, ShoppingBag, X } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { formatCurrency } from '@/services/paymentService';
@@ -17,59 +19,177 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { ShopifyProductDetail } from '@/types/request';
+import { useQuery } from '@tanstack/react-query';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedColor, setSelectedColor] = useState<ProductColor | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addToCart } = useCart();
   const { toast } = useToast();
   const emblaApiRef = useRef<any>(null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
   
+  // Use React Query to fetch product data
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => getProductByHandle(id || ''),
+    enabled: !!id
+  });
+  
+  // Extract unique colors from variants
+  const uniqueColors = product ? [...new Set(product.variants.map(v => v.color))] : [];
+  
+  // Initialize selected color and available sizes when product loads
   useEffect(() => {
-    const fetchProduct = async () => {
-      if (!id) return;
-      
-      try {
-        setLoading(true);
-        const data = await getProductById(id);
-        if (data) {
-          setProduct(data);
-          // Set default selections
-          if (data.colors && data.colors.length > 0) {
-            setSelectedColor(data.colors[0]);
-          }
-          if (data.sizes && data.sizes.length > 0) {
-            setSelectedSize(data.sizes[0]);
-          }
-        } else {
-          navigate('/not-found');
-        }
-      } catch (error) {
-        console.error('Failed to fetch product:', error);
-      } finally {
-        setLoading(false);
+    if (product) {
+      // Set initial color selection
+      if (uniqueColors.length > 0 && !selectedColor) {
+        setSelectedColor(uniqueColors[0]);
       }
-    };
+      
+      // Update available sizes for the selected color
+      updateAvailableSizesForColor(selectedColor || uniqueColors[0]);
+    }
+  }, [product, uniqueColors]);
+  
+  // Update available sizes when color changes
+  useEffect(() => {
+    if (product && selectedColor) {
+      updateAvailableSizesForColor(selectedColor);
+    }
+  }, [selectedColor, product]);
+  
+  // Update selected variant when size or color changes
+  useEffect(() => {
+    if (product && selectedColor && selectedSize) {
+      const variant = product.variants.find(v => 
+        v.color === selectedColor && v.size === selectedSize
+      );
+      
+      setSelectedVariant(variant || null);
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [selectedColor, selectedSize, product]);
+  
+  // Function to update available sizes for a given color
+  const updateAvailableSizesForColor = (color: string) => {
+    if (!product) return;
     
-    fetchProduct();
-  }, [id, navigate]);
+    // Get all sizes for the selected color
+    const sizes = product.variants
+      .filter(variant => variant.color === color)
+      .map(variant => variant.size);
+    
+    // Get unique sizes
+    const uniqueSizes = [...new Set(sizes)];
+    setAvailableSizes(uniqueSizes);
+    
+    // If current selected size is not available in new color, select the first available one
+    if (selectedSize && !uniqueSizes.includes(selectedSize)) {
+      setSelectedSize(uniqueSizes.length > 0 ? uniqueSizes[0] : null);
+    } else if (!selectedSize && uniqueSizes.length > 0) {
+      setSelectedSize(uniqueSizes[0]);
+    }
+  };
+  
+  // Get variant by color and size
+  const getVariantByColorAndSize = (color: string, size: string): ProductVariant | undefined => {
+    return product?.variants.find(v => v.color === color && v.size === size);
+  };
+  
+  // Check if a specific size is available for the selected color
+  const isSizeAvailable = (size: string): boolean => {
+    if (!product || !selectedColor) return false;
+    const variant = getVariantByColorAndSize(selectedColor, size);
+    return variant ? variant.available : false;
+  };
+  
+  // Get selected variant price
+  const getPrice = (): { price: string, compareAtPrice?: string } => {
+    if (selectedVariant) {
+      return {
+        price: selectedVariant.price,
+        compareAtPrice: selectedVariant.compareAtPrice
+      };
+    }
+    
+    // Default to first variant if none selected
+    if (product && product.variants.length > 0) {
+      return {
+        price: product.variants[0].price,
+        compareAtPrice: product.variants[0].compareAtPrice
+      };
+    }
+    
+    return { price: '0.0' };
+  };
+  
+  // Calculate discount percentage
+  const getDiscountPercentage = (): number | null => {
+    const { price, compareAtPrice } = getPrice();
+    
+    if (compareAtPrice && parseFloat(compareAtPrice) > parseFloat(price)) {
+      const discount = 100 - (parseFloat(price) * 100 / parseFloat(compareAtPrice));
+      return Math.round(discount);
+    }
+    
+    return null;
+  };
   
   const handleAddToCart = () => {
-    if (product && selectedSize) {
-      addToCart(product, 1);
+    if (!product) return;
+    
+    if (selectedVariant) {
+      if (!selectedVariant.available) {
+        toast({
+          title: "Out of Stock",
+          description: `This combination is currently not available.`,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      addToCart(
+        {
+          id: product.id,
+          title: product.title,
+          description: product.description,
+          price: parseFloat(selectedVariant.price),
+          compareAtPrice: selectedVariant.compareAtPrice ? parseFloat(selectedVariant.compareAtPrice) : undefined,
+          currency: 'USD',
+          image: product.images[0],
+          category: '',
+          inStock: selectedVariant.available,
+          images: product.images,
+          handle: product.handle,
+        },
+        1,
+        selectedVariant.id,
+        selectedSize || undefined,
+        selectedColor || undefined
+      );
+      
       toast({
         title: "Added to Cart",
-        description: `${product.title} (${selectedSize}) has been added to your cart.`,
+        description: `${product.title} (${selectedSize}, ${selectedColor}) has been added to your cart.`,
       });
-    } else if (!selectedSize && product?.sizes?.length) {
+    } else if (!selectedSize) {
       toast({
         title: "Please select a size",
         description: "You must select a size before adding to cart.",
+        variant: "destructive"
+      });
+    } else if (!selectedColor) {
+      toast({
+        title: "Please select a color",
+        description: "You must select a color before adding to cart.",
         variant: "destructive"
       });
     }
@@ -80,10 +200,6 @@ const ProductDetail: React.FC = () => {
     
     try {
       const isFavorite = await toggleFavorite(product.id);
-      setProduct(prev => {
-        if (!prev) return null;
-        return { ...prev, isFavorite };
-      });
       toast({
         title: isFavorite ? "Added to Favorites" : "Removed from Favorites",
         description: isFavorite 
@@ -95,22 +211,12 @@ const ProductDetail: React.FC = () => {
     }
   }, [product, toast]);
   
-  const handleColorChange = (color: ProductColor) => {
-    if (color.name !== selectedColor?.name) {
-      setSelectedColor(color);
-      // Check if the color has an ID for navigation
-      if (color.id) {
-        navigate(`/product/${color.id}`);
-      } else {
-        // If no specific ID for the color, just update the selected color without navigation
-        console.log(`Color ${color.name} has no associated product ID`);
-      }
-    }
+  const handleColorChange = (color: string) => {
+    setSelectedColor(color);
   };
   
-  const imagesToDisplay = selectedColor && product?.images 
-    ? [selectedColor.image, ...product.images.filter(img => img !== selectedColor.image)]
-    : product?.images || [product?.image || ''];
+  // Get color-specific images if available, or use all product images
+  const imagesToDisplay = product?.images || [];
   
   const handleCarouselApi = useCallback((api: any) => {
     if (!api) return;
@@ -131,7 +237,8 @@ const ProductDetail: React.FC = () => {
     };
   }, []);
   
-  if (loading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen">
         <Navbar />
@@ -150,7 +257,26 @@ const ProductDetail: React.FC = () => {
     );
   }
   
-  if (!product) return null;
+  // Error state
+  if (error || !product) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 text-center">
+          <h2 className="text-2xl font-semibold text-gray-800">Product not found</h2>
+          <p className="text-gray-600 mt-2">We couldn't find the product you're looking for.</p>
+          <Button onClick={() => navigate(-1)} className="mt-4">
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  // Price information
+  const { price, compareAtPrice } = getPrice();
+  const discountPercentage = getDiscountPercentage();
+  const isOutOfStock = selectedVariant ? !selectedVariant.available : false;
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -199,12 +325,18 @@ const ProductDetail: React.FC = () => {
                 className="absolute top-3 right-3 bg-white hover:bg-white/90 rounded-full p-1.5 shadow-sm"
                 size="icon"
                 variant="outline"
-                aria-label={product.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                aria-label="Add to favorites"
               >
-                <Heart 
-                  className={`h-5 w-5 ${product.isFavorite ? 'text-red-500 fill-red-500' : 'text-black'}`} 
-                />
+                <Heart className="h-5 w-5 text-black" />
               </Button>
+              
+              {discountPercentage && (
+                <Badge 
+                  className="absolute top-3 left-3 bg-red-500 hover:bg-red-600 text-white"
+                >
+                  Save {discountPercentage}%
+                </Badge>
+              )}
             </Carousel>
           </motion.div>
           
@@ -215,41 +347,70 @@ const ProductDetail: React.FC = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <h1 className="text-2xl font-semibold mb-2">{product.title}</h1>
-            <p className="text-xl font-medium mb-4">
-              {formatCurrency(product.price)}
-            </p>
+            
+            <div className="flex items-center mb-4">
+              <p className="text-xl font-medium">
+                {formatCurrency(parseFloat(price))}
+              </p>
+              
+              {compareAtPrice && parseFloat(compareAtPrice) > parseFloat(price) && (
+                <p className="text-gray-500 line-through ml-3">
+                  {formatCurrency(parseFloat(compareAtPrice))}
+                </p>
+              )}
+            </div>
             
             <p className="text-cloth-mediumgray mb-6">
               {product.description}
             </p>
             
-            {product.colors && product.colors.length > 0 && (
+            {uniqueColors.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium mb-3">Colors</h3>
-                <div className="flex gap-3">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color.name}
-                      onClick={() => handleColorChange(color)}
-                      className={cn(
-                        "w-10 h-10 rounded-full border-2 transition-all",
-                        selectedColor?.name === color.name 
-                          ? "border-black scale-110" 
-                          : "border-transparent hover:border-gray-300"
-                      )}
-                      aria-label={`Select ${color.name} color`}
-                    >
-                      <span 
-                        className="block w-full h-full rounded-full" 
-                        style={{ backgroundColor: color.value }}
-                      />
-                    </button>
-                  ))}
+                <div className="flex flex-wrap gap-3">
+                  {uniqueColors.map((color) => {
+                    // Check if any variant with this color is available
+                    const hasAvailableVariants = product.variants.some(
+                      variant => variant.color === color && variant.available
+                    );
+                    
+                    return (
+                      <button
+                        key={color}
+                        onClick={() => handleColorChange(color)}
+                        disabled={!hasAvailableVariants}
+                        className={cn(
+                          "w-12 h-12 rounded-full border-2 transition-all relative",
+                          selectedColor === color 
+                            ? "border-black scale-110" 
+                            : "border-transparent hover:border-gray-300",
+                          !hasAvailableVariants && "opacity-50 cursor-not-allowed"
+                        )}
+                        aria-label={`Select ${color} color`}
+                      >
+                        <span 
+                          className="block w-full h-full rounded-full bg-cover bg-center"
+                          style={{ 
+                            backgroundColor: color.toLowerCase(),
+                            // Convert color name to actual color value
+                            backgroundImage: `url(${
+                              product.images[uniqueColors.indexOf(color) % product.images.length]
+                            })`
+                          }}
+                        />
+                        {!hasAvailableVariants && (
+                          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/30">
+                            <X className="w-6 h-6 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
             
-            {product.sizes && product.sizes.length > 0 && (
+            {availableSizes.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium mb-3">Size</h3>
                 <RadioGroup 
@@ -257,32 +418,54 @@ const ProductDetail: React.FC = () => {
                   onValueChange={setSelectedSize}
                   className="flex flex-wrap gap-2"
                 >
-                  {product.sizes.map((size) => (
-                    <div key={size} className="flex items-center">
-                      <label
-                        className={cn(
-                          "flex items-center justify-center w-12 h-12 border rounded-md cursor-pointer text-sm transition-all",
-                          selectedSize === size 
-                            ? "bg-black text-white border-black" 
-                            : "bg-white text-black border-gray-300 hover:border-gray-500"
-                        )}
-                      >
-                        <RadioGroupItem value={size} className="sr-only" id={`size-${size}`} />
-                        {size}
-                      </label>
-                    </div>
-                  ))}
+                  {availableSizes.map((size) => {
+                    const isAvailable = isSizeAvailable(size);
+                    
+                    return (
+                      <div key={size} className="flex items-center">
+                        <label
+                          className={cn(
+                            "flex items-center justify-center w-12 h-12 border rounded-md text-sm transition-all",
+                            selectedSize === size && isAvailable
+                              ? "bg-black text-white border-black" 
+                              : "bg-white text-black border-gray-300 hover:border-gray-500",
+                            !isAvailable && "opacity-50 cursor-not-allowed bg-gray-100 line-through"
+                          )}
+                        >
+                          <RadioGroupItem 
+                            value={size} 
+                            className="sr-only" 
+                            id={`size-${size}`} 
+                            disabled={!isAvailable}
+                          />
+                          {size}
+                        </label>
+                      </div>
+                    );
+                  })}
                 </RadioGroup>
               </div>
             )}
             
             <button
               onClick={handleAddToCart}
-              className="w-full flex items-center justify-center bg-cloth-charcoal text-white py-3 px-6 rounded-md hover:bg-black transition-colors"
+              disabled={isOutOfStock || !selectedVariant}
+              className={cn(
+                "w-full flex items-center justify-center text-white py-3 px-6 rounded-md transition-colors",
+                isOutOfStock || !selectedVariant
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-cloth-charcoal hover:bg-black"
+              )}
             >
               <ShoppingBag className="h-5 w-5 mr-2" />
-              Add to Cart
+              {isOutOfStock ? "Out of Stock" : "Add to Cart"}
             </button>
+            
+            {isOutOfStock && (
+              <p className="text-red-500 text-sm mt-2 text-center">
+                This product is currently out of stock in the selected combination.
+              </p>
+            )}
           </motion.div>
         </div>
       </main>

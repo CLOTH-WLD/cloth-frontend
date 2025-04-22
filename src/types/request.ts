@@ -1,3 +1,4 @@
+
 export interface BackendResponse<T> {
   status: number;
   message: string;
@@ -153,4 +154,13 @@ export interface SearchProductsResponse {
   products: ShopifyProduct[];
   hasNextPage: boolean;
   nextCursor: string;
+}
+
+export interface ShopifyProductDetail {
+  id: string;
+  title: string;
+  description: string;
+  handle: string;
+  images: string[];
+  variants: ShopifyVariant[];
 }

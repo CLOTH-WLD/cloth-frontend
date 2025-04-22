@@ -15,6 +15,7 @@ import {
   RequestParams,
   SearchProductsResponse,
   ShopFilters,
+  ShopifyProductDetail,
   UpdateEmailPayload,
   UpdatePreferencePayload,
   UpdateShippingPayload,
@@ -91,8 +92,8 @@ export const getCollectionProducts = async (
   return response.data;
 };
 
-export const getProductByHandle = async (handle: string): Promise<Product> => {
-  const response = await backendRequest<Product>(
+export const getProductByHandle = async (handle: string): Promise<ShopifyProductDetail> => {
+  const response = await backendRequest<ShopifyProductDetail>(
     "GET",
     `shop/product/${handle}`
   );

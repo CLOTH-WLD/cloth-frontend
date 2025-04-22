@@ -15,6 +15,7 @@ export interface Product {
   colors?: ProductColor[];
   sizes?: string[];
   images?: string[];
+  handle?: string;
 }
 
 export interface ProductColor {
@@ -26,9 +27,12 @@ export interface ProductColor {
 
 export interface ProductVariant {
   id: string;
-  title: string;
+  title?: string;
   price: number;
+  compareAtPrice?: number;
   available: boolean;
+  size?: string;
+  color?: string;
   option1?: string; // e.g. Size
   option2?: string; // e.g. Color
 }
@@ -37,6 +41,8 @@ export interface CartItem {
   product: Product;
   quantity: number;
   variantId?: string;
+  size?: string;
+  color?: string;
 }
 
 export interface PaymentIntent {
@@ -72,6 +78,7 @@ export interface ShopifyProduct {
   description: string;
   images: string[];
   variants: ShopifyVariant[];
+  handle?: string;
 }
 
 export interface ShopifyVariant {
