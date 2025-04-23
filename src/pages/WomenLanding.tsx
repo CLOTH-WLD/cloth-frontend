@@ -10,6 +10,7 @@ import NotificationBanner from '@/components/NotificationBanner';
 import { useEffect, useState } from 'react';
 import CategoryList from '@/components/CategoryList';
 import { getCollectionProducts } from '@/lib/backendRequests';
+import { getCollectionsByName } from '@/lib/backendRequests';
 import { useToast } from '@/hooks/use-toast';
 
 const WomenLanding: React.FC = () => {
@@ -19,6 +20,8 @@ const WomenLanding: React.FC = () => {
   const [arrivalsLoading, setArrivalsLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const categoryFilter = searchParams.get('category');
+  const [womenCollections, setWomenCollections] = useState<any[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(true);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -128,6 +131,20 @@ const WomenLanding: React.FC = () => {
     fetchNewArrivals();
   }, [toast]);
   
+  useEffect(() => {
+    async function fetchCollections() {
+      setCollectionsLoading(true);
+      try {
+        const res = await getCollectionsByName('women');
+        setWomenCollections(res.slice(0, 12));
+      } catch (err) {
+        setWomenCollections([]);
+      }
+      setCollectionsLoading(false);
+    }
+    fetchCollections();
+  }, []);
+
   const womenCategories = [
     "Women's shoes",
     "Women's t-shirts and tops",
@@ -226,7 +243,29 @@ const WomenLanding: React.FC = () => {
         {/* Women's Favorite Categories */}
         <div className="py-8 px-4 sm:px-6 max-w-7xl mx-auto">
           <h2 className="text-2xl font-semibold mb-6">Women's Favorite Categories</h2>
-          <CategoryList categories={womenCategories} />
+          {collectionsLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {Array.from({ length: 8 }).map((_, i) =>
+                <div className="bg-cloth-lightgray rounded p-4 animate-pulse h-10" key={i} />
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {womenCollections.map((col: any) => (
+                <button
+                  key={col.id}
+                  className="text-left p-2 hover:bg-cloth-lightbeige transition-colors rounded-md font-helvetica text-sm"
+                  onClick={() => {
+                    if (col.handle) {
+                      window.location.href = `/collection/${col.handle}`;
+                    }
+                  }}
+                >
+                  {col.title}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
         <NotificationBanner />
