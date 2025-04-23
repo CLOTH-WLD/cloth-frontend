@@ -503,3 +503,20 @@ export const getCollectionById = async (
 
   return response.data;
 };
+
+export const getCollectionsByName = async (
+  nameFragment: string
+): Promise<ShopifyCollection[]> => {
+  const response = await backendRequest<ShopifyCollection[]>(
+    "GET",
+    `shop/collections/name/${encodeURIComponent(nameFragment)}`
+  );
+
+  if (!response.data) {
+    throw new Error(
+      `Failed to fetch collections by name. Status: ${response.status}, Message: ${response.message}`
+    );
+  }
+
+  return response.data;
+};
