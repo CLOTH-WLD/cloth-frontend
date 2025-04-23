@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-// Use getProductById, not getProductByHandle
 import { getProductById } from '@/lib/backendRequests'; 
 import { toggleFavorite } from '@/services/productService';
 import { Product, ProductVariant, ShopifyVariant } from '@/types/product';
@@ -24,7 +22,6 @@ import { Badge } from '@/components/ui/badge';
 import { ShopifyProductDetail } from '@/types/request';
 import { useQuery } from '@tanstack/react-query';
 
-// Util to extract Shopify numeric ID from a GID string
 function extractShopifyNumericId(gid: string) {
   const matches = gid.match(/(\d+)$/);
   return matches ? matches[1] : gid;
@@ -42,17 +39,14 @@ const ProductDetail: React.FC = () => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
 
-  // Fetch product by plain ID
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: () => (id ? getProductById(id) : Promise.reject()),
     enabled: !!id
   });
 
-  // Extract unique colors from variants
   const uniqueColors = product ? [...new Set(product.variants.map(v => v.color))] : [];
 
-  // Initialize selected color and available sizes when product loads
   useEffect(() => {
     if (product) {
       if (uniqueColors.length > 0 && !selectedColor) {
@@ -60,17 +54,14 @@ const ProductDetail: React.FC = () => {
       }
       updateAvailableSizesForColor(selectedColor || uniqueColors[0]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, uniqueColors]);
 
   useEffect(() => {
     if (product && selectedColor) {
       updateAvailableSizesForColor(selectedColor);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColor, product]);
 
-  // Convert ShopifyVariant → ProductVariant
   function shopifyToProductVariant(variant: ShopifyVariant): ProductVariant {
     return {
       id: variant.id,
@@ -79,7 +70,6 @@ const ProductDetail: React.FC = () => {
       available: variant.available,
       size: variant.size,
       color: variant.color,
-      // option1/option2 are not used, can add if needed
     };
   }
 
@@ -96,10 +86,8 @@ const ProductDetail: React.FC = () => {
     } else {
       setSelectedVariant(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColor, selectedSize, product]);
 
-  // Function to update available sizes for a given color
   const updateAvailableSizesForColor = (color: string) => {
     if (!product) return;
     const sizes = product.variants
@@ -115,19 +103,16 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  // Get variant by color and size
   const getVariantByColorAndSize = (color: string, size: string): ShopifyVariant | undefined => {
     return product?.variants.find(v => v.color === color && v.size === size);
   };
 
-  // Check if a specific size is available for the selected color
   const isSizeAvailable = (size: string): boolean => {
     if (!product || !selectedColor) return false;
     const variant = getVariantByColorAndSize(selectedColor, size);
     return variant ? variant.available : false;
   };
 
-  // Get selected variant price
   const getPrice = (): { price: number, compareAtPrice?: number } => {
     if (selectedVariant) {
       return {
@@ -146,7 +131,6 @@ const ProductDetail: React.FC = () => {
     return { price: 0 };
   };
 
-  // Calculate discount percentage
   const getDiscountPercentage = (): number | null => {
     const { price, compareAtPrice } = getPrice();
     if (compareAtPrice && compareAtPrice > price) {
@@ -169,7 +153,6 @@ const ProductDetail: React.FC = () => {
         return;
       }
 
-      // Use extractShopifyNumericId to get a plain productId
       addToCart(
         {
           id: extractShopifyNumericId(product.id),
@@ -228,7 +211,6 @@ const ProductDetail: React.FC = () => {
     setSelectedColor(color);
   };
 
-  // Get color-specific images if available, or use all product images
   const imagesToDisplay = product?.images || [];
 
   const handleCarouselApi = useCallback((api: any) => {
@@ -243,7 +225,6 @@ const ProductDetail: React.FC = () => {
     };
   }, []);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen">
@@ -263,7 +244,6 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  // Error state
   if (error || !product) {
     return (
       <div className="min-h-screen">
@@ -279,7 +259,6 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  // Price information
   const { price, compareAtPrice } = getPrice();
   const discountPercentage = getDiscountPercentage();
   const isOutOfStock = selectedVariant ? !selectedVariant.available : false;
@@ -348,7 +327,14 @@ const ProductDetail: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <h1 className="text-2xl font-semibold mb-2">{product.title}</h1>
+            <h1 className="text-2xl font-semibold mb-2">
+              {product.title}
+              {selectedColor && (
+                <span className="ml-2 text-base font-normal text-cloth-mediumgray">
+                  - {selectedColor}
+                </span>
+              )}
+            </h1>
             <div className="flex items-center mb-4">
               <p className="text-xl font-medium">
                 {formatCurrency(price)}

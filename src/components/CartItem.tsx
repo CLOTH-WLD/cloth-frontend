@@ -14,17 +14,17 @@ interface CartItemProps {
 
 const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
   const { updateQuantity, removeFromCart } = useCart();
-  const { product, quantity } = item;
+  const { product, quantity, size, color } = item;
   const navigate = useNavigate();
   
   const handleNavigateToProduct = () => {
     navigate(`/product/${product.id}`);
   };
-  
-  // Determine which properties to display
-  const hasSize = product.sizes && product.sizes.length > 0;
-  const hasColor = product.colors && product.colors.length > 0;
-  
+
+  // Determine display values for size and color
+  const displaySize = size || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined);
+  const displayColor = color || (product.colors && product.colors.length > 0 ? product.colors[0]?.name : undefined);
+
   return (
     <motion.div 
       className="flex items-center py-4 border-b border-gray-100"
@@ -43,7 +43,6 @@ const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
           className="h-full w-full object-cover object-center"
         />
       </div>
-      
       <div className="ml-4 flex flex-1 flex-col">
         <div className="flex justify-between text-base font-medium">
           <h3 
@@ -51,31 +50,36 @@ const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
             onClick={handleNavigateToProduct}
           >
             {product.title}
-            {hasSize && (
+            {displayColor ? (
               <span className="ml-1 text-xs font-normal text-cloth-mediumgray">
-                ({product.sizes[0]})
+                - {displayColor}
               </span>
-            )}
+            ) : null}
+            {displaySize ? (
+              <span className="ml-1 text-xs font-normal text-cloth-mediumgray">
+                ({displaySize})
+              </span>
+            ) : null}
           </h3>
           <p className="ml-4 text-sm font-medium">
             {formatCurrency(product.price * quantity)}
           </p>
         </div>
-        
+
         {/* Show size and color if available */}
-        <div className="mt-1 text-xs text-gray-500">
-          {(hasSize || hasColor) && (
+        {(displaySize || displayColor) && (
+          <div className="mt-1 text-xs text-gray-500">
             <div className="flex space-x-2">
-              {hasSize && (
-                <span>Size: {product.sizes?.[0]}</span>
+              {displaySize && (
+                <span>Size: {displaySize}</span>
               )}
-              {hasColor && hasSize && <span>•</span>}
-              {hasColor && (
-                <span>Color: {product.colors?.[0].name}</span>
+              {displaySize && displayColor && <span>•</span>}
+              {displayColor && (
+                <span>Color: {displayColor}</span>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
         
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-center border rounded-md">
@@ -111,3 +115,4 @@ const CartItem: React.FC<CartItemProps> = ({ item, index }) => {
 };
 
 export default CartItem;
+
