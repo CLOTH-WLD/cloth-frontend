@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Product } from '@/types/product';
 import { Heart } from 'lucide-react';
@@ -7,6 +8,12 @@ import { formatCurrency } from '@/services/paymentService';
 import { Button } from '@/components/ui/button';
 import { toggleFavorite } from '@/services/productService';
 import { useToast } from '@/hooks/use-toast';
+
+// Util to extract Shopify numeric ID
+function extractShopifyNumericId(gid: string): string {
+  const matches = /\d+$/.exec(gid);
+  return matches ? matches[0] : gid;
+}
 
 interface ProductCardProps {
   product: Product;
@@ -46,7 +53,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
     >
-      <Link to={`/product/${product.id}`} className="block">
+      <Link to={`/product/${extractShopifyNumericId(product.id)}`} className="block">
         <div className="overflow-hidden relative">
           <img 
             src={product.image} 

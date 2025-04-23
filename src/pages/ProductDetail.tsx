@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getProductByHandle } from '@/lib/backendRequests'; 
+// Use getProductById, not getProductByHandle
+import { getProductById } from '@/lib/backendRequests'; 
 import { toggleFavorite } from '@/services/productService';
 import { Product, ProductVariant, ShopifyVariant } from '@/types/product';
 import { useCart } from '@/context/CartContext';
@@ -23,6 +24,12 @@ import { Badge } from '@/components/ui/badge';
 import { ShopifyProductDetail } from '@/types/request';
 import { useQuery } from '@tanstack/react-query';
 
+// Util to extract Shopify numeric ID from a GID string
+function extractShopifyNumericId(gid: string) {
+  const matches = gid.match(/(\d+)$/);
+  return matches ? matches[1] : gid;
+}
+
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -34,96 +41,92 @@ const ProductDetail: React.FC = () => {
   const emblaApiRef = useRef<any>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  
-  // Use React Query to fetch product data
+
+  // Fetch product by plain ID
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
-    queryFn: () => getProductByHandle(id || ''),
+    queryFn: () => (id ? getProductById(id) : Promise.reject()),
     enabled: !!id
   });
-  
+
   // Extract unique colors from variants
   const uniqueColors = product ? [...new Set(product.variants.map(v => v.color))] : [];
-  
+
   // Initialize selected color and available sizes when product loads
   useEffect(() => {
     if (product) {
-      // Set initial color selection
       if (uniqueColors.length > 0 && !selectedColor) {
         setSelectedColor(uniqueColors[0]);
       }
-      
-      // Update available sizes for the selected color
       updateAvailableSizesForColor(selectedColor || uniqueColors[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, uniqueColors]);
-  
-  // Update available sizes when color changes
+
   useEffect(() => {
     if (product && selectedColor) {
       updateAvailableSizesForColor(selectedColor);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColor, product]);
-  
-  // Update selected variant when size or color changes
+
+  // Convert ShopifyVariant → ProductVariant
+  function shopifyToProductVariant(variant: ShopifyVariant): ProductVariant {
+    return {
+      id: variant.id,
+      price: parseFloat(variant.price),
+      compareAtPrice: variant.compareAtPrice ? parseFloat(variant.compareAtPrice) : undefined,
+      available: variant.available,
+      size: variant.size,
+      color: variant.color,
+      // option1/option2 are not used, can add if needed
+    };
+  }
+
   useEffect(() => {
     if (product && selectedColor && selectedSize) {
-      const shopifyVariant = product.variants.find(v => 
-        v.color === selectedColor && v.size === selectedSize
+      const shopifyVariant = product.variants.find(
+        v => v.color === selectedColor && v.size === selectedSize
       );
-      
       if (shopifyVariant) {
-        // Convert ShopifyVariant to ProductVariant, converting price from string to number
-        const variant: ProductVariant = {
-          id: shopifyVariant.id,
-          price: parseFloat(shopifyVariant.price),
-          compareAtPrice: shopifyVariant.compareAtPrice ? parseFloat(shopifyVariant.compareAtPrice) : undefined,
-          available: shopifyVariant.available,
-          size: shopifyVariant.size,
-          color: shopifyVariant.color
-        };
-        setSelectedVariant(variant);
+        setSelectedVariant(shopifyToProductVariant(shopifyVariant));
       } else {
         setSelectedVariant(null);
       }
     } else {
       setSelectedVariant(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColor, selectedSize, product]);
-  
+
   // Function to update available sizes for a given color
   const updateAvailableSizesForColor = (color: string) => {
     if (!product) return;
-    
-    // Get all sizes for the selected color
     const sizes = product.variants
       .filter(variant => variant.color === color)
       .map(variant => variant.size);
-    
-    // Get unique sizes
     const uniqueSizes = [...new Set(sizes)];
     setAvailableSizes(uniqueSizes);
-    
-    // If current selected size is not available in new color, select the first available one
+
     if (selectedSize && !uniqueSizes.includes(selectedSize)) {
       setSelectedSize(uniqueSizes.length > 0 ? uniqueSizes[0] : null);
     } else if (!selectedSize && uniqueSizes.length > 0) {
       setSelectedSize(uniqueSizes[0]);
     }
   };
-  
+
   // Get variant by color and size
   const getVariantByColorAndSize = (color: string, size: string): ShopifyVariant | undefined => {
     return product?.variants.find(v => v.color === color && v.size === size);
   };
-  
+
   // Check if a specific size is available for the selected color
   const isSizeAvailable = (size: string): boolean => {
     if (!product || !selectedColor) return false;
     const variant = getVariantByColorAndSize(selectedColor, size);
     return variant ? variant.available : false;
   };
-  
+
   // Get selected variant price
   const getPrice = (): { price: number, compareAtPrice?: number } => {
     if (selectedVariant) {
@@ -132,33 +135,30 @@ const ProductDetail: React.FC = () => {
         compareAtPrice: selectedVariant.compareAtPrice
       };
     }
-    
-    // Default to first variant if none selected
     if (product && product.variants.length > 0) {
       return {
         price: parseFloat(product.variants[0].price),
-        compareAtPrice: product.variants[0].compareAtPrice ? parseFloat(product.variants[0].compareAtPrice) : undefined
+        compareAtPrice: product.variants[0].compareAtPrice
+          ? parseFloat(product.variants[0].compareAtPrice)
+          : undefined
       };
     }
-    
     return { price: 0 };
   };
-  
+
   // Calculate discount percentage
   const getDiscountPercentage = (): number | null => {
     const { price, compareAtPrice } = getPrice();
-    
     if (compareAtPrice && compareAtPrice > price) {
       const discount = 100 - (price * 100 / compareAtPrice);
       return Math.round(discount);
     }
-    
     return null;
   };
-  
+
   const handleAddToCart = () => {
     if (!product) return;
-    
+
     if (selectedVariant) {
       if (!selectedVariant.available) {
         toast({
@@ -168,10 +168,11 @@ const ProductDetail: React.FC = () => {
         });
         return;
       }
-      
+
+      // Use extractShopifyNumericId to get a plain productId
       addToCart(
         {
-          id: product.id,
+          id: extractShopifyNumericId(product.id),
           title: product.title,
           description: product.description,
           price: selectedVariant.price,
@@ -188,7 +189,7 @@ const ProductDetail: React.FC = () => {
         selectedSize || undefined,
         selectedColor || undefined
       );
-      
+
       toast({
         title: "Added to Cart",
         description: `${product.title} (${selectedSize}, ${selectedColor}) has been added to your cart.`,
@@ -207,12 +208,11 @@ const ProductDetail: React.FC = () => {
       });
     }
   };
-  
+
   const handleToggleFavorite = useCallback(async () => {
     if (!product) return;
-    
     try {
-      const isFavorite = await toggleFavorite(product.id);
+      const isFavorite = await toggleFavorite(extractShopifyNumericId(product.id));
       toast({
         title: isFavorite ? "Added to Favorites" : "Removed from Favorites",
         description: isFavorite 
@@ -223,33 +223,26 @@ const ProductDetail: React.FC = () => {
       console.error('Failed to toggle favorite:', error);
     }
   }, [product, toast]);
-  
+
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
   };
-  
+
   // Get color-specific images if available, or use all product images
   const imagesToDisplay = product?.images || [];
-  
+
   const handleCarouselApi = useCallback((api: any) => {
     if (!api) return;
-    
     emblaApiRef.current = api;
-    
-    // Initial index
     setCurrentImageIndex(api.selectedScrollSnap());
-    
-    // Add event listener for the select event
     api.on('select', () => {
       setCurrentImageIndex(api.selectedScrollSnap());
     });
-    
-    // Cleanup on unmount
     return () => {
       api.off('select');
     };
   }, []);
-  
+
   // Loading state
   if (isLoading) {
     return (
@@ -269,7 +262,7 @@ const ProductDetail: React.FC = () => {
       </div>
     );
   }
-  
+
   // Error state
   if (error || !product) {
     return (
@@ -285,16 +278,16 @@ const ProductDetail: React.FC = () => {
       </div>
     );
   }
-  
+
   // Price information
   const { price, compareAtPrice } = getPrice();
   const discountPercentage = getDiscountPercentage();
   const isOutOfStock = selectedVariant ? !selectedVariant.available : false;
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1 max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <button 
           onClick={() => navigate(-1)}
@@ -303,7 +296,7 @@ const ProductDetail: React.FC = () => {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back
         </button>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -328,11 +321,9 @@ const ProductDetail: React.FC = () => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              
               <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded">
                 {currentImageIndex + 1}/{imagesToDisplay.length}
               </div>
-              
               <Button
                 onClick={handleToggleFavorite}
                 className="absolute top-3 right-3 bg-white hover:bg-white/90 rounded-full p-1.5 shadow-sm"
@@ -342,7 +333,6 @@ const ProductDetail: React.FC = () => {
               >
                 <Heart className="h-5 w-5 text-black" />
               </Button>
-              
               {discountPercentage && (
                 <Badge 
                   className="absolute top-3 left-3 bg-red-500 hover:bg-red-600 text-white"
@@ -352,7 +342,6 @@ const ProductDetail: React.FC = () => {
               )}
             </Carousel>
           </motion.div>
-          
           <motion.div
             className="flex flex-col"
             initial={{ opacity: 0, y: 20 }}
@@ -360,33 +349,27 @@ const ProductDetail: React.FC = () => {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <h1 className="text-2xl font-semibold mb-2">{product.title}</h1>
-            
             <div className="flex items-center mb-4">
               <p className="text-xl font-medium">
                 {formatCurrency(price)}
               </p>
-              
               {compareAtPrice && compareAtPrice > price && (
                 <p className="text-gray-500 line-through ml-3">
                   {formatCurrency(compareAtPrice)}
                 </p>
               )}
             </div>
-            
             <p className="text-cloth-mediumgray mb-6">
               {product.description}
             </p>
-            
             {uniqueColors.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium mb-3">Colors</h3>
                 <div className="flex flex-wrap gap-3">
                   {uniqueColors.map((color) => {
-                    // Check if any variant with this color is available
                     const hasAvailableVariants = product.variants.some(
                       variant => variant.color === color && variant.available
                     );
-                    
                     return (
                       <button
                         key={color}
@@ -405,7 +388,6 @@ const ProductDetail: React.FC = () => {
                           className="block w-full h-full rounded-full bg-cover bg-center"
                           style={{ 
                             backgroundColor: color.toLowerCase(),
-                            // Convert color name to actual color value
                             backgroundImage: `url(${
                               product.images[uniqueColors.indexOf(color) % product.images.length]
                             })`
@@ -422,7 +404,6 @@ const ProductDetail: React.FC = () => {
                 </div>
               </div>
             )}
-            
             {availableSizes.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium mb-3">Size</h3>
@@ -433,7 +414,6 @@ const ProductDetail: React.FC = () => {
                 >
                   {availableSizes.map((size) => {
                     const isAvailable = isSizeAvailable(size);
-                    
                     return (
                       <div key={size} className="flex items-center">
                         <label
@@ -459,7 +439,6 @@ const ProductDetail: React.FC = () => {
                 </RadioGroup>
               </div>
             )}
-            
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock || !selectedVariant}
@@ -473,7 +452,6 @@ const ProductDetail: React.FC = () => {
               <ShoppingBag className="h-5 w-5 mr-2" />
               {isOutOfStock ? "Out of Stock" : "Add to Cart"}
             </button>
-            
             {isOutOfStock && (
               <p className="text-red-500 text-sm mt-2 text-center">
                 This product is currently out of stock in the selected combination.
@@ -482,7 +460,6 @@ const ProductDetail: React.FC = () => {
           </motion.div>
         </div>
       </main>
-      
       <Footer />
     </div>
   );
