@@ -475,7 +475,7 @@ export const getProductById = async (
 ): Promise<ShopifyProductDetail> => {
   const response = await backendRequest<ShopifyProductDetail>(
     "GET",
-    `shop/product/${productId}`
+    `shop/product/id/${productId}`
   );
 
   if (!response.data) {
@@ -492,7 +492,7 @@ export const getCollectionById = async (
 ): Promise<ShopifyCollection> => {
   const response = await backendRequest<ShopifyCollection>(
     "GET",
-    `shop/collections/${collectionId}`
+    `shop/collections/id/${collectionId}`
   );
 
   if (!response.data) {
