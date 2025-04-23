@@ -15,9 +15,20 @@ const CategoryGrid: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await getCollections({ first: 28 });
-        setCollections(data.slice(0, 28));
+        const response = await getCollections({ first: 28 });
+        
+        // Check if the data has the expected structure
+        if (response.collections && Array.isArray(response.collections)) {
+          setCollections(response.collections.slice(0, 28));
+        } else if (Array.isArray(response)) {
+          // Fallback for direct array response
+          setCollections(response.slice(0, 28));
+        } else {
+          console.error('Unexpected collections data structure:', response);
+          setError('Failed to load categories: unexpected data format');
+        }
       } catch (err) {
+        console.error('Error fetching collections:', err);
         setError('Failed to load categories');
       } finally {
         setLoading(false);
